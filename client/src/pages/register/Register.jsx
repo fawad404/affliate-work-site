@@ -1,0 +1,681 @@
+import React, { useState } from "react";
+import { useFormik } from "formik";
+import CustomizeInput from "../../utils/Input/CustomizeInput";
+import CustomizeTextArea from "../../utils/Input/CustomizeTextarea";
+import { useNavigate } from "react-router-dom";
+import { Axios } from "../../config";
+import requests from "../../libs/request";
+import { toast } from "react-toastify";
+import loader from "../../assets/icons/loader.svg";
+import { BsUpload } from "react-icons/bs";
+import { registerSchema } from "../../schemas";
+import upload from "../../libs/upload";
+
+const Register = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const initialValues = {
+    username: "",
+    birthdate: null,
+    email: "",
+    password: "",
+    phone: "",
+    address: "",
+    cnic: "",
+    skills: [],
+    payoneer: "",
+    wise: "",
+    idCardFront: null,
+    idCardBack: null,
+    img: null,
+    bankImg: null,
+    bankIban: null,
+    easypaisaAccount: null,
+    isSeller: false,
+  };
+  const onSubmit = async (payload, actions) => {
+    setLoading(true);
+    const url = await upload(values.idCardFront);
+    const urlImg = await upload(values.img);
+    const urlImgBack = await upload(values.idCardBack);
+    const BankImage = await upload(values.bankImg);
+    console.log({payload});
+    console.log("Id card front img:", url);
+    console.log("url img:", urlImg);
+    console.log("url Back img:", urlImgBack);
+    console.log("url Back bankImg:", BankImage);
+    
+
+    try {
+      const res = await Axios.post(requests.register, {
+        ...payload,
+        img: urlImg,
+        idCardFront: url,
+        idCardBack: urlImgBack,
+        bankImg: BankImage,
+      });
+      toast.success(res?.data, {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+      navigate("/");
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      if (error?.response?.data) {
+        toast.error(error?.response?.data, {
+          position: "bottom-right",
+          toastId: 1,
+          autoClose: 1500,
+        });
+      } else {
+        toast.error(error?.response?.message, {
+          position: "bottom-right",
+          toastId: 1,
+          autoClose: 1500,
+        });
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    actions.resetForm();
+  };
+
+  const {
+    handleChange,
+    values,
+    handleBlur,
+    handleSubmit,
+    errors,
+    touched,
+    setFieldValue,
+  } = useFormik({
+    initialValues,
+    validationSchema: registerSchema,
+    onSubmit,
+  });
+
+  const getError = (key) => {
+    return touched[key] && errors[key];
+  };
+
+  function handleImageChange(event, field) {
+    const file = event.currentTarget.files[0];
+    if (file && !file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      setFieldValue(field, null);
+      return;
+    }
+    setFieldValue(field, file);
+  }
+
+  const handleCNICChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+
+    if (value.length > 13) {
+      value = value.slice(0, 13); // Limit to 13 characters (CNIC length)
+    }
+
+    // Add hyphens at appropriate positions
+    if (value.length <= 5) {
+      value = value.slice(0, 5);
+    } else if (value.length <= 12) {
+      value = value.slice(0, 5) + "-" + value.slice(5);
+    } else {
+      value = value.slice(0, 5) + "-" + value.slice(5, 12) + "-" + value.slice(12);
+    }
+
+    // Update the Formik field value
+    setFieldValue("cnic", value);
+  };
+
+
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    const updatedSkills = checked
+      ? [...values.skills, value]
+      : values.skills.filter((skill) => skill !== value);
+    setFieldValue("skills", updatedSkills);
+  };
+
+  return (
+    <div className="py-24 lg:py-40 pb-10">
+      <div className="contain">
+        <div className="w-full lg:w-[75%] flex items-center flex-col sm:flex-row justify-center py-10 mx-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-start flex-col sm:flex-row justify-start gap-8 w-full"
+          >
+            <div className="flex items-start justify-start flex-col gap-4 w-full sm:flex-1">
+              <h1 className="text-2xl text-darkColor font-semibold">
+                Create an Account
+              </h1>
+              <CustomizeInput
+                showLabel={false}
+                htmlFor="username"
+                label="Username"
+                labelClassName="text-sm font-medium text-darkColor"
+                type="text"
+                name="username"
+                value={values.username}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getError("username")}
+                id="username"
+                placeholder="Johndoe"
+                className="bg-white  border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+              />
+
+                <CustomizeInput
+                  showLabel={false}
+                  htmlFor="birthdate"
+                  label="Birthdate"
+                  labelClassName="text-sm font-medium text-darkColor"
+                  type="date"  // Set input type to date
+                  name="birthdate"  // Update the name to reflect the birthdate
+                  value={values.birthdate}  // Bind to the birthdate value
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={getError("birthdate")}  // Get the error for birthdate instead of username
+                  id="birthdate"  // Update the id to match the new input
+                  className="bg-white border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+                />
+
+                <CustomizeInput
+                  showLabel={false}
+                  htmlFor="address"
+                  label="Address"
+                  labelClassName="text-sm font-medium text-darkColor"
+                  type="text"  // Keep input type as text for an address
+                  name="address"  // Change the name to address
+                  value={values.address}  // Bind to the address value
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={getError("address")}  // Get the error for address
+                  id="address"  // Update the id to match the new input
+                  placeholder="Enter your address"  // Set a suitable placeholder for address
+                  className="bg-white border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+                />
+
+
+                <CustomizeInput
+                  showLabel={false}
+                  htmlFor="cnic"
+                  label="CNIC"
+                  labelClassName="text-sm font-medium text-darkColor"
+                  type="text"  // Keep input type as text for CNIC
+                  name="cnic"  // Change name to cnic
+                  value={values.cnic}  // Bind to the CNIC value
+                  onChange={handleCNICChange}
+                  onBlur={handleBlur}
+                  error={getError("cnic")}  // Get error for CNIC field
+                  id="cnic"  // Update id for CNIC field
+                  placeholder="XXXXX-XXXXXXX-X"  // Placeholder with the CNIC format
+                  pattern="^\d{5}-\d{7}-\d{1}$"  // Optional regex pattern for CNIC validation
+                  className="bg-white border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+                />
+
+                <div className="relative w-full">
+                      <label className="text-sm font-medium text-darkColor">Your Skills</label>
+                      <div className="bg-white border border-[#C7CBD1] w-full rounded p-4">
+                        <div className="hover:relative">
+                          <span className="text-xs text-gray-500 cursor-pointer" title="Mark all that match.">
+                            (Mark all that match)
+                          </span>
+                        </div>
+                        <div className="mt-2">
+                          {["Presentation Slides", "Data Entry", "Paper Reviews", "Graphic Design", "Customer Chat Support"].map((skill, index) => (
+                            <div key={index} className="flex items-center mb-2">
+                              <input
+                                type="checkbox"
+                                id={`skill-${index}`}
+                                name="skills"
+                                value={skill}
+                                className="w-4 h-4 border-gray-300 rounded focus:ring-primary"
+                                onChange={handleCheckboxChange}
+                              />
+                              <label htmlFor={`skill-${index}`} className="ml-2 text-sm text-darkColor">
+                                {skill}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      </div>
+
+
+                      
+              <CustomizeInput
+                showLabel={false}
+                htmlFor="email"
+                label="Email Address"
+                labelClassName="text-sm font-medium text-darkColor"
+                type="text"
+                name="email"
+                value={values.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getError("email")}
+                id="email"
+                placeholder="Email Address"
+                className="bg-white  border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+              />
+              <CustomizeInput
+                showLabel={false}
+                htmlFor="password"
+                label="Password"
+                labelClassName="text-sm font-medium text-darkColor"
+                type="password"
+                name="password"
+                value={values.password}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={getError("password")}
+                id="password"
+                placeholder="********"
+                className="bg-white  border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+              />
+              <div className="w-full">
+                <CustomizeInput
+                  showLabel={false}
+                  htmlFor="img"
+                  label="Profile Picture"
+                  labelClassName="text-sm font-medium text-darkColor"
+                  type="file"
+                  name="img"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, "img")}
+                  id="img"
+                  className="hidden"
+                />
+                <div
+                  className={`flex justify-center items-center flex-col gap-3 w-full border h-[136px] rounded-md text-sm text-gray-600 ${
+                    touched.img && errors.img
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                >
+                  {values?.img?.type?.startsWith("image/") ? (
+                    <label
+                      htmlFor="img"
+                      className="cursor-pointer h-full w-full flex items-center justify-center"
+                    >
+                      <img
+                        src={URL.createObjectURL(values.img)}
+                        alt={values.img.name}
+                        className="w-[120px] h-[120px] rounded-full object-cover"
+                      />
+                    </label>
+                  ) : (
+                    <>
+                    
+                      <p>Upload Cover Image</p>
+                      <BsUpload size={20} />
+                      <label
+                        htmlFor="img"
+                        className="w-fit border py-2 px-5 rounded-md cursor-pointer"
+                      >
+                        Browser
+                      </label>
+                    </>
+                  )}
+                </div>
+                {!values?.img?.type?.startsWith("image/") && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-500">Sample Image:</p>
+                    <img
+                      src="/path/to/sample-image.jpg" 
+                      alt="Sample Profile Pic"
+                      className="w-full h-[190px] object-cover border border-gray-300"
+                    />
+                  </div>
+                )}
+              </div>
+
+                <CustomizeInput
+                showLabel={false}
+                containerClass="my-2"
+                htmlFor="phone"
+                label="Phone Number"
+                labelClassName="text-sm font-medium text-darkColor"
+                type="text"
+                name="phone"
+                value={values.phone}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                id="phone"
+                placeholder="phone"
+                className="bg-white  border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+              />
+              <p className="text-xs text-gray-500 -mt-3">
+                    (Must have WhatsApp)
+                  </p>
+              <button
+                type="submit"
+                className="w-full bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-3 transition-all duration-300 mt-4 hidden sm:block"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <img src={loader} alt="/" className="w-[40px]" />
+                  </div>
+                ) : (
+                  <p className="flex items-center justify-center gap-2">
+                    Register
+                  </p>
+                )}
+              </button>
+            </div>
+            <div className="flex items-start justify-start flex-col gap-4 w-full sm:flex-1">
+              <h1 className="text-2xl text-darkColor font-semibold">
+                Bank Details
+              </h1>
+              {/* <div className="w-full mt-8">
+                <label className="flex items-center justify-start w-full relative gap-4">
+                  <span className="text-[#5D6771] text-[15px] leading-5 font-medium flex items-center justify-center select-none">
+                    Activate the seller account
+                  </span>
+                  <span className="flex items-center justify-center select-none action">
+                    <input
+                      type="checkbox"
+                      className="appearance-none"
+                      value={values.isSeller}
+                      onChange={handleChange}
+                      name="isSeller"
+                    />
+                    <i className="bg-[#c5c7c9] relative w-11 h-6 rounded-xl transition-all duration-200 before:content-[''] before:absolute before:top-[2px] before:left-[2.8px] before:w-5 before:h-5 before:bg-white before:rounded-full before:shadow-newLongShadow before:transition-all before:duration-300 cursor-pointer"></i>
+                  </span>
+                </label>
+              </div> */}
+
+              
+<div className="relative w-full">
+        <label className="text-sm font-medium text-darkColor">Do you have a Payoneer Account?</label>
+        <div className="bg-white border border-[#C7CBD1] w-full rounded p-4">
+          <div className="hover:relative">
+            <span className="text-xs text-gray-500 cursor-pointer" title="If you don’t know what Payoneer is, click No.">
+              (If you don’t know what Payoneer is, click No)
+            </span>
+          </div>
+          <div className="mt-2">
+            <div className="flex items-center mb-2">
+              <input
+                type="radio"
+                id="payoneer-yes"
+                name="payoneer"
+                value="yes"
+                className="w-4 h-4 border-gray-300 focus:ring-primary"
+                onChange={handleChange}
+              />
+              <label htmlFor="payoneer-yes" className="ml-2 text-sm text-darkColor">
+                Yes
+              </label>
+            </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="radio"
+                id="payoneer-no"
+                name="payoneer"
+                value="no"
+                className="w-4 h-4 border-gray-300 focus:ring-primary"
+                onChange={handleChange}
+              />
+              <label htmlFor="payoneer-no" className="ml-2 text-sm text-darkColor">
+                No
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Add validation logic */}
+      {values.payoneer === "no" && (
+        <p className="text-sm text-red-500 mt-2">
+          Please ensure you understand Payoneer before proceeding.
+        </p>
+      )}
+      
+      <div className="relative w-full">
+        <label className="text-sm font-medium text-darkColor">Do you have a Wise Account?</label>
+        <div className="bg-white border border-[#C7CBD1] w-full rounded p-4">
+          <div className="hover:relative">
+            <span className="text-xs text-gray-500 cursor-pointer" title="If you don’t know what Wise is, click No.">
+              (If you don’t know what Wise is, click No)
+            </span>
+          </div>
+          <div className="mt-2">
+            <div className="flex items-center mb-2">
+              <input
+                type="radio"
+                id="wise-yes"
+                name="wise"
+                value="yes"
+                className="w-4 h-4 border-gray-300 focus:ring-primary"
+                onChange={handleChange}
+              />
+              <label htmlFor="wise-yes" className="ml-2 text-sm text-darkColor">
+                Yes
+              </label>
+            </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="radio"
+                id="wise-no"
+                name="wise"
+                value="no"
+                className="w-4 h-4 border-gray-300 focus:ring-primary"
+                onChange={handleChange}
+              />
+              <label htmlFor="wise-no" className="ml-2 text-sm text-darkColor">
+                No
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Add validation logic */}
+      {values.wise === "no" && (
+        <p className="text-sm text-red-500 mt-2">
+          Please ensure you understand Wise before proceeding.
+        </p>
+      )}
+              
+
+                  <CustomizeInput
+                    showLabel={false}
+                    htmlFor="bankIban"
+                    label="Your Pakistani Bank IBAN"
+                    labelClassName="text-sm font-medium text-darkColor"
+                    type="text"
+                    name="bankIban"
+                    value={values.bankIban}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={getError("bankIban")}
+                    id="bankIban"
+                    placeholder="Pakistani Bank IBAN"
+                    className="bg-white border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+                  />
+
+
+                  <CustomizeInput
+                    showLabel={false}
+                    htmlFor="easypaisaAccount"
+                    label="EasyPaisa Account IDAN"
+                    labelClassName="text-sm font-medium text-darkColor"
+                    type="text"
+                    name="easypaisaAccount"
+                    value={values.easypaisaAccount}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={getError("easypaisaAccount")}
+                    id="easypaisaAccount"
+                    placeholder="EasyPaisa Account IDAN"
+                    className="bg-white border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+                  />
+
+                  <p className="text-sm text-darkColor mt-2">
+                    (Please ensure that the information entered is accurate and corresponds to your actual bank and EasyPaisa accounts.)
+                  </p>
+
+
+                  <div className="w-full">
+                  <CustomizeInput
+                    showLabel={false}
+                    htmlFor="bankImg"
+                    label="Bank Account Number with Title Img"
+                    type="file"
+                    name="img"
+                    accept="image/*"
+                    onChange={(e) => handleImageChange(e, "bankImg")}
+                    id="bankImg"
+                    className="hidden"
+                  />
+                  <div className={`flex justify-center items-center flex-col gap-3 w-full border h-[136px] rounded-md text-sm text-gray-600 ${touched.bankImg && errors.bankImg ? "border-red-500" : "border-gray-300"}`}>
+                    {values?.bankImg?.type?.startsWith("image/") ? (
+                      <label htmlFor="bankImg" className="cursor-pointer h-full w-full flex items-center justify-center">
+                        <img src={URL.createObjectURL(values.bankImg)} alt="Profile" className="w-[120px] h-[120px] rounded-full object-cover" />
+                      </label>
+                    ) : (
+                      <>
+                        <p>Upload Bank Account Number with Title Img</p>
+                        <BsUpload size={20} />
+                        <label htmlFor="bankImg" className="w-fit border py-2 px-5 rounded-md cursor-pointer">Browse</label>
+                      </>
+                    )}
+                  </div>
+                  {!values?.bankImg?.type?.startsWith("image/") && (
+                    <div className="mt-3">
+                      <p className="text-sm text-darkColor mt-2">
+                        (Picture of your Bank Account Number with Title, see samples below.)
+                      </p>
+                      <div className="mt-4">
+                        <p className="text-sm font-medium text-darkColor">Sample Images:</p>
+                        <div className="flex flex-col md:flex-row space-x-4 mt-4">
+                          <img src="sample1.jpg" alt="Sample 1" className="w-32 h-32 rounded"/>
+                          <img src="sample2.jpg" alt="Sample 2" className="w-32 h-32 rounded"/>
+                          <img src="sample3.jpg" alt="Sample 3" className="w-32 h-32 rounded"/>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+              <div className="w-full">
+                <CustomizeInput
+                  showLabel={false}
+                  htmlFor="idCardFront"
+                  label="ID Card Front"
+                  type="file"
+                  name="idCardFront"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange(e, "idCardFront")}
+                  id="idCardFront"
+                  className="hidden"
+                />
+                <div
+                  className={`flex justify-center items-center flex-col gap-3 w-full border h-[200px] text-sm text-gray-600 ${
+                    touched.idCardFront && errors.idCardFront ? "border-red-500" : "border-gray-300"
+                  }`}
+                >
+                  {values?.idCardFront?.type?.startsWith("image/") ? (
+                    <label
+                      htmlFor="idCardFront"
+                      className="cursor-pointer h-full w-full flex items-center justify-center"
+                    >
+                      <img
+                        src={URL.createObjectURL(values.idCardFront)}
+                        alt="ID Card Front"
+                        className="w-[190px] h-[120px] object-cover"
+                      />
+                    </label>
+                  ) : (
+                    <>
+                      <p>Upload ID Card Front</p>
+                      <BsUpload size={20} />
+                      <label
+                        htmlFor="idCardFront"
+                        className="w-fit border py-2 px-5 rounded-md cursor-pointer"
+                      >
+                        Browse
+                      </label>
+                    </>
+                  )}
+                </div>
+
+                {/* Display sample image if no image is uploaded */}
+                {!values?.idCardFront?.type?.startsWith("image/") && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-500">Sample Image:</p>
+                    <img
+                      src="/path/to/sample-image.jpg" 
+                      alt="Sample ID Card Front"
+                      className="w-full h-[190px] object-cover border border-gray-300"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="w-full">
+              <CustomizeInput
+                showLabel={false}
+                htmlFor="idCardBack"
+                label="ID Card Back"
+                type="file"
+                name="idCardBack"
+                accept="image/*"
+                onChange={(e) => handleImageChange(e, "idCardBack")}
+                id="idCardBack"
+                className="hidden"
+              />
+              <div className={`flex justify-center items-center flex-col gap-3 w-full border h-[136px] rounded-md text-sm text-gray-600 ${touched.idCardBack && errors.idCardBack ? "border-red-500" : "border-gray-300"}`}>
+                {values?.idCardBack?.type?.startsWith("image/") ? (
+                  <label htmlFor="idCardBack" className="cursor-pointer h-full w-full flex items-center justify-center">
+                    <img src={URL.createObjectURL(values.idCardBack)} alt="ID Card Back" className="w-[120px] h-[120px] object-cover" />
+                  </label>
+                ) : (
+                  <>
+                    <p>Upload ID Card Back</p>
+                    <BsUpload size={20} />
+                    <label htmlFor="idCardBack" className="w-fit border py-2 px-5 rounded-md cursor-pointer">Browse</label>
+                  </>
+                )}
+              </div>
+
+               {/* Display sample image if no image is uploaded */}
+               {!values?.idCardBack?.type?.startsWith("image/") && (
+                  <div className="mt-3">
+                    <p className="text-sm text-gray-500">Sample Image:</p>
+                    <img
+                      src="/path/to/sample-image.jpg" 
+                      alt="Sample ID Card Back"
+                      className="w-full h-[190px] object-cover border border-gray-300"
+                    />
+                  </div>
+                )}
+              </div>
+
+            
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-3 transition-all duration-300 mt-4 sm:hidden"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <img src={loader} alt="/" className="w-[40px]" />
+                </div>
+              ) : (
+                <p className="flex items-center justify-center gap-2">
+                  Register
+                </p>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
