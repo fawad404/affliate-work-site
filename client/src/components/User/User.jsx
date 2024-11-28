@@ -1,6 +1,35 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Avatar from "../../assets/icons/avatar.jpg";
+import { useNavigate } from "react-router-dom";
+
 const User = ({users}) => {
+  const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const toggleDropdown = (id) => {
+    setDropdownOpen((prevId) => (prevId === id ? null : id));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".dropdown-menu")) {
+        setDropdownOpen(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  const handleEditClick = (userId) => {
+    navigate(`/dashboard/update-user/${userId}`)
+    // console.log("handle edit click user is:" , user);
+    // setSelectedUser(user);
+    // setIsModalOpen(true);
+  };
       
   return (
     <section className="py-8 mt-8">
@@ -45,13 +74,41 @@ const User = ({users}) => {
             {data.isVerified === true ? 'Verified' : 'Not'}
           </span>
         </td>
-        <td className="py-5 pl-3 md:px-6">
-          <a href={`/dashboard/users/${data._id}`}>
-            <span className="inline-block py-1 px-2 text-white rounded-full cursor-pointer bg-green-500">
-              Edit
-            </span>
-          </a>
-        </td>
+        <td className="py-5 pl-3 md:px-6 relative">
+                    <button
+                      className="text-gray-600 hover:text-gray-900 text-2xl"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleDropdown(data._id);
+                      }}
+                    >
+                      ⋮
+                    </button>
+                    {dropdownOpen === data._id && (
+                      <div className="dropdown-menu absolute right-0 mt-2 w-28 bg-white border border-gray-200 rounded shadow-md z-10">
+                        <ul className="text-sm text-gray-700">
+                          <li
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => handleEditClick(data._id)}
+                          >
+                            Edit
+                          </li>
+                          <li
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => console.log("Delete", data._id)}
+                          >
+                            Delete
+                          </li>
+                          <li
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => console.log("Update", data._id)}
+                          >
+                            Update
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </td>
       </tr>
     ))}
   </tbody>

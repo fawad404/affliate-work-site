@@ -227,22 +227,22 @@ const Navbar = () => {
                     openDrop ? "flex" : "hidden"
                   }`}
                 >
-                  {authUser?.isSeller && (
+                  {authUser?.isVerified ? (
                     <>
-                      <NavLink to="/myGigs" className="cursor-pointer w-full text-sm text-darkColor">
-                        Gigs
+                      <NavLink to="/dashboard" className="cursor-pointer w-full text-sm text-darkColor">
+                        Profile
                       </NavLink>
-                      <NavLink to="/add" className="cursor-pointer w-full text-sm text-darkColor">
-                        Add New Gigs
+                      <NavLink to="/dashboard/tasks" className="cursor-pointer w-full text-sm text-darkColor">
+                        Tasks
+                      </NavLink>
+                    </>
+                  ) : (
+                    <>
+                    <NavLink to="/verification" className="cursor-pointer w-full text-sm text-darkColor">
+                        Under Verification
                       </NavLink>
                     </>
                   )}
-                  <NavLink to="/orders" className="cursor-pointer w-full text-sm text-darkColor">
-                    Orders
-                  </NavLink>
-                  <NavLink to="/messages" className="cursor-pointer w-full text-sm text-darkColor">
-                    Messages
-                  </NavLink>
                   <div onClick={handleLogout} className="cursor-pointer w-full text-sm text-darkColor">
                     Logout
                   </div>

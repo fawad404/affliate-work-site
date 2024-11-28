@@ -19,6 +19,8 @@ import Users from "./pages/users/Users";
 import Update from "./components/Update/Update";
 import useAuthStore from "./stores";
 import NotFound from "./components/NotFound/NotFound";
+import Tasks from "./components/tasks/Tasks";
+import TaskDetails from "./components/taskDetails/TaskDetails";
 
 const App = () => {
   const location = useLocation(); // Get the current route
@@ -35,9 +37,14 @@ const App = () => {
         <Route path="/join" element={<Register />} />
         {authUser && (
           <>
-                  <Route path="/dashboard" element={authUser.isSeller ? <Admin /> : <NotFound />} />
+                  <Route path="/dashboard" element={authUser.isVerified ? <Admin /> : <NotFound />} />
                   <Route path="/dashboard/users" element={authUser.isAdmin ? <Users /> : <NotFound />} />
-                  <Route path="/dashboard/users/:id" element={authUser.isAdmin ? <Update /> : <NotFound />} />
+                  <Route path="/dashboard/tasks" element={authUser.isVerified ? <Tasks /> : <NotFound />} />
+                  <Route path="/dashboard/tasks/:id" element={authUser.isAdmin ? <TaskDetails /> : <NotFound />} />
+                  <Route path="/dashboard/my-tasks" element={authUser.isVerified ? <Tasks /> : <NotFound />} />
+                  <Route path="/dashboard/update-user/:id" element={authUser.isAdmin ? <Update /> : <NotFound />} />
+                  <Route path="/dashboard/create-task" element={authUser.isAdmin ? <Admin /> : <NotFound />} />
+                  <Route path="/dashboard/update-task/:id" element={authUser.isAdmin ? <Admin /> : <NotFound />} />
           </>
         )}
         <Route path="/gigs" element={<Gigs />} />

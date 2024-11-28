@@ -3,6 +3,7 @@ const requests = {
   register: "/api/auth/register",
   logout: "/api/auth/logout",
   gigs: "/api/gigs",
+  tasks: "/api/task",
   reviews: "/api/reviews",
   users: "/api/user",
   orders: "/api/orders",

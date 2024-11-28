@@ -1,6 +1,8 @@
+import AddTask from "../../components/AddTask/AddTask";
 import FloatingWhatsApp from "../../components/FloatingWhatsApp/FloatingWhatsApp";
 import Payoneer from "../../components/Payoneer/Payoneer";
 import Sidebar from "../../components/Sidebar/Sidebar";
+
 
 const Admin = () => {
 
@@ -8,7 +10,8 @@ const Admin = () => {
         <div className="">
             <FloatingWhatsApp />
             <Sidebar />
-             <Payoneer />
+            <AddTask />
+             {/* <Payoneer /> */}
             </div>
       
       )
