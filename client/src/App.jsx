@@ -21,6 +21,7 @@ import useAuthStore from "./stores";
 import NotFound from "./components/NotFound/NotFound";
 import Tasks from "./components/tasks/Tasks";
 import TaskDetails from "./components/taskDetails/TaskDetails";
+import Updater from "./pages/updateTask/updater";
 
 const App = () => {
   const location = useLocation(); // Get the current route
@@ -44,7 +45,7 @@ const App = () => {
                   <Route path="/dashboard/my-tasks" element={authUser.isVerified ? <Tasks /> : <NotFound />} />
                   <Route path="/dashboard/update-user/:id" element={authUser.isAdmin ? <Update /> : <NotFound />} />
                   <Route path="/dashboard/create-task" element={authUser.isAdmin ? <Admin /> : <NotFound />} />
-                  <Route path="/dashboard/update-task/:id" element={authUser.isAdmin ? <Admin /> : <NotFound />} />
+                  <Route path="/dashboard/update-task/:id" element={authUser.isAdmin ? <Updater /> : <NotFound />} />
           </>
         )}
         <Route path="/gigs" element={<Gigs />} />

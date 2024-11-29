@@ -1,44 +1,100 @@
-import React, { useEffect } from 'react'
-import Sidebar from '../../components/Sidebar/Sidebar'
-import FloatingWhatsApp from '../../components/FloatingWhatsApp/FloatingWhatsApp'
-import { Axios } from '../../config'
-import requests from '../../libs/request'
-import { useQuery } from '@tanstack/react-query'
-import loader from "../../assets/icons/loader.svg";
-import Task from '../Task/Task'
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "react-router-dom";
+import Axios from "axios";
+import PaginationControls from "../PaginationControls/PaginationControls";
+import FloatingWhatsApp from '../../components/FloatingWhatsApp/FloatingWhatsApp';
+import Sidebar from '../Sidebar/Sidebar';
+import Task from '../Task/Task';
+import loader from "../../assets/icons/loader.svg"; 
 
 const Tasks = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const query = new URLSearchParams(location.search);
+  const initialPage = parseInt(query.get('page') || '1');
+  const initialLimit = parseInt(query.get('per_page') || '1');
 
-      const { isLoading, error, data } = useQuery({
-        queryKey: ["tasks"],
-        queryFn: () => Axios.get(requests.tasks).then((res) => res.data),
-      });      
-      //console.log(data);
-    
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [limit, setLimit] = useState(initialLimit);
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const page = parseInt(query.get('page') || '1');
+    const perPage = parseInt(query.get('per_page') || '1');
+    setCurrentPage(page);
+    setLimit(perPage);
+  }, [location.search]);
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["tasks", currentPage, limit],
+    queryFn: () => {
+      console.log(`Fetching tasks with limit: ${limit}, page: ${currentPage}`);
+      return Axios.get(`http://localhost:8000/api/task?page=${currentPage}&limit=${limit}`).then((res) => res.data);
+    },
+    keepPreviousData: true, 
+  });
+  console.log('Data received:', data);
+
+  const totalPages = data?.totalPages || 1;
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      const newPage = currentPage + 1;
+      navigate(`?page=${newPage}&per_page=${limit}`);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      const newPage = currentPage - 1;
+      navigate(`?page=${newPage}&per_page=${limit}`);
+    }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    navigate(`?page=${pageNumber}&per_page=${limit}`);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    navigate(`?page=1&per_page=${newLimit}`);
+  };
+
   return (
     <>
-    
-    {isLoading ? (
+      {isLoading ? (
         <div className="flex items-center justify-center w-full mt-28">
-          <img src={loader} alt="/" className="w-[40px]" />
+          <img src={loader} alt="Loading..." className="w-[40px]" />
         </div>
       ) : error ? (
         <p className="text-xl md:text-2xl text-red-400 font-normal">
-          Error : Something went wrong
+          Error: Something went wrong
         </p>
       ) : (
-    <>
-    <FloatingWhatsApp />
-    <div>
-        <Sidebar />
-        <div className='ml-0 lg:ml-[16%]'>
-        <Task users={data}/>
-        </div>
-    </div>
-    </>
+        <>
+          <FloatingWhatsApp />
+          <div>
+            <Sidebar />
+            <div className='ml-0 lg:ml-[16%]'>
+              <Task users={data} />
+              <div className="mt-4">
+                <PaginationControls
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  perPage={limit}
+                  onNext={handleNext}
+                  onPrevious={handlePrevious}
+                  onPageChange={handlePageChange}
+                  onLimitChange={handleLimitChange}
+                />
+              </div>
+            </div>
+          </div>
+        </>
       )}
-      </>
-  )
-}
+    </>
+  );
+};
 
-export default Tasks
+export default Tasks;

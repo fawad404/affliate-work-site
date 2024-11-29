@@ -53,19 +53,19 @@ const Task = ({ users }) => {
               </tr>
             </thead>
             <tbody>
-              {users.tasks.map((data) => (
+              {users?.tasks?.map((data) => (
                 <tr className="text-xs bg-gray-50" key={data._id}>
                   <td className="py-5 px-6 font-medium hidden md:table-cell">{data.title}</td>
                   <td className="py-3 pr-3 md:px-4">
                     <div className="flex items-center">
                       <img
                         className="w-8 h-8 mr-4 object-cover rounded-md"
-                        src={data.assignee.img || Avatar}
+                        src={data.assignee?.img || Avatar}
                         alt=""
                       />
                       <div>
-                        <p className="font-medium">{data.assignee.username}</p>
-                        <p className="text-gray-500 text-sm">{data.assignee.email}</p>
+                        <p className="font-medium">{data.assignee?.username}</p>
+                        <p className="text-gray-500 text-sm">{data.assignee?.email}</p>
                       </div>
                     </div>
                   </td>

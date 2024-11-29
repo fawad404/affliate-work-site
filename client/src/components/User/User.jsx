@@ -46,71 +46,79 @@ const User = ({users}) => {
     </tr>
   </thead>
   <tbody>
-    {users.map((data) => (
-      <tr className="text-xs bg-gray-50" key={data._id}>
-        <td className="py-5 px-6 font-medium hidden md:table-cell">{data._id}</td>
-        <td className="py-3 pr-3 md:px-4">
-          <div className="flex items-center">
-            <img
-              className="w-8 h-8 mr-4 object-cover rounded-md"
-              src={data.img || Avatar}
-              alt=""
-            />
-            <div>
-              <p className="font-medium">{data.username}</p>
-              <p className="text-gray-500 text-sm">{data.email}</p>
+    {users && users.length > 0 ? (
+      users.map((data) => (
+        <tr className="text-xs bg-gray-50" key={data._id}>
+          <td className="py-5 px-6 font-medium hidden md:table-cell">{data._id}</td>
+          <td className="py-3 pr-3 md:px-4">
+            <div className="flex items-center">
+              <img
+                className="w-8 h-8 mr-4 object-cover rounded-md"
+                src={data.img || Avatar}
+                alt=""
+              />
+              <div>
+                <p className="font-medium">{data.username}</p>
+                <p className="text-gray-500 text-sm">{data.email}</p>
+              </div>
             </div>
-          </div>
+          </td>
+          <td className="py-5 px-6 font-medium hidden md:table-cell">
+            <button>{data.phone ? data.phone : 'null'}</button>
+          </td>
+          <td className="py-5 pl-6 md:px-6">
+            <span
+              className={`inline-block py-1 px-2 text-white rounded-full cursor-pointer ${
+                data.isVerified === true ? 'bg-green-500' : 'bg-red-500'
+              }`}
+            >
+              {data.isVerified === true ? 'Verified' : 'Not'}
+            </span>
+          </td>
+          <td className="py-5 pl-3 md:px-6 relative">
+                      <button
+                        className="text-gray-600 hover:text-gray-900 text-2xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleDropdown(data._id);
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      {dropdownOpen === data._id && (
+                        <div className="dropdown-menu absolute right-0 mt-2 w-28 bg-white border border-gray-200 rounded shadow-md z-10">
+                          <ul className="text-sm text-gray-700">
+                            <li
+                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                              onClick={() => handleEditClick(data._id)}
+                            >
+                              Edit
+                            </li>
+                            <li
+                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                              onClick={() => console.log("Delete", data._id)}
+                            >
+                              Delete
+                            </li>
+                            <li
+                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                              onClick={() => console.log("Update", data._id)}
+                            >
+                              Update
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan="5" className="text-center py-5">
+          No users found.
         </td>
-        <td className="py-5 px-6 font-medium hidden md:table-cell">
-          <button>{data.phone ? data.phone : 'null'}</button>
-        </td>
-        <td className="py-5 pl-6 md:px-6">
-          <span
-            className={`inline-block py-1 px-2 text-white rounded-full cursor-pointer ${
-              data.isVerified === true ? 'bg-green-500' : 'bg-red-500'
-            }`}
-          >
-            {data.isVerified === true ? 'Verified' : 'Not'}
-          </span>
-        </td>
-        <td className="py-5 pl-3 md:px-6 relative">
-                    <button
-                      className="text-gray-600 hover:text-gray-900 text-2xl"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleDropdown(data._id);
-                      }}
-                    >
-                      ⋮
-                    </button>
-                    {dropdownOpen === data._id && (
-                      <div className="dropdown-menu absolute right-0 mt-2 w-28 bg-white border border-gray-200 rounded shadow-md z-10">
-                        <ul className="text-sm text-gray-700">
-                          <li
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => handleEditClick(data._id)}
-                          >
-                            Edit
-                          </li>
-                          <li
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => console.log("Delete", data._id)}
-                          >
-                            Delete
-                          </li>
-                          <li
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => console.log("Update", data._id)}
-                          >
-                            Update
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </td>
       </tr>
-    ))}
+    )}
   </tbody>
 </table>
 
