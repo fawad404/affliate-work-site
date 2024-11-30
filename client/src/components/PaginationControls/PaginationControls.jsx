@@ -57,7 +57,7 @@ const PaginationControls = ({ totalPages, currentPage, perPage, onNext, onPrevio
               key={index}
               className={`px-3 py-2 rounded-md ${
                 p === currentPage
-                  ? 'bg-yellow-400 text-white'
+                  ? 'bg-indigo-500 text-gray-50'
                   : 'bg-gray-200 hover:bg-gray-300'
               }`}
               onClick={() => goToPage(p)}
@@ -95,7 +95,7 @@ const PaginationControls = ({ totalPages, currentPage, perPage, onNext, onPrevio
             const newLimit = parseInt(e.target.value, 10);
             onLimitChange(newLimit);
           }}
-          className="block px-2 py-1 border rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring focus:ring-yellow-400 focus:border-yellow-400 text-sm"
+          className="block px-2 py-1 border rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-400 text-sm"
         >
           <option value={1}>1</option>
           <option value={3}>3</option>

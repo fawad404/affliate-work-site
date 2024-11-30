@@ -31,6 +31,9 @@ const Task = ({ users }) => {
     // setSelectedUser(user);
     // setIsModalOpen(true);
   };
+  const handleSeeTaskClick = (taskId) => {
+    navigate(`/dashboard/tasks/${taskId}`)
+  }
 
   const handleModalSubmit = (updatedData) => {
     console.log("Updated User Data:", updatedData);
@@ -108,9 +111,9 @@ const Task = ({ users }) => {
                           </li>
                           <li
                             className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => console.log("Update", data._id)}
+                            onClick={() => handleSeeTaskClick(data._id)}
                           >
-                            Update
+                            See Task
                           </li>
                         </ul>
                       </div>
