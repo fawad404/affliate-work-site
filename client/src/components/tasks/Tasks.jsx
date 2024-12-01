@@ -77,18 +77,20 @@ const Tasks = () => {
           <div>
             <Sidebar />
             <div className='ml-0 lg:ml-[16%]'>
-              <Task users={data} />
-              <div className="mt-4">
-                <PaginationControls
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  perPage={limit}
-                  onNext={handleNext}
-                  onPrevious={handlePrevious}
-                  onPageChange={handlePageChange}
-                  onLimitChange={handleLimitChange}
-                />
-              </div>
+              <Task />
+              {data?.tasks?.length > 0 && (
+                <div className="mt-4">
+                  <PaginationControls
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                    perPage={limit}
+                    onNext={handleNext}
+                    onPrevious={handlePrevious}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </>

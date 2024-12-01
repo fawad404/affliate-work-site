@@ -11,7 +11,7 @@ const fetchTaskById = async (id) => {
     return Axios.get(`${requests.tasks}/${id}`).then((res) => res.data);
   };
 
-const TaskDetails = () => {
+const  TaskDetails = () => {
     const { id } = useParams(); // Extract the ID from the URL
     const { isLoading, error, data } = useQuery(
       ["task", id], // Use ID in queryKey

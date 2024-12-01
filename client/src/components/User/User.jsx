@@ -30,6 +30,9 @@ const User = ({users}) => {
     // setSelectedUser(user);
     // setIsModalOpen(true);
   };
+  const handleSeeUser = (userId) => {
+    navigate(`/dashboard/user/${userId}`);
+  }
       
   return (
     <section className="py-8 mt-8">
@@ -102,9 +105,9 @@ const User = ({users}) => {
                             </li>
                             <li
                               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                              onClick={() => console.log("Update", data._id)}
+                              onClick={() => handleSeeUser(data._id)}
                             >
-                              Update
+                              See User
                             </li>
                           </ul>
                         </div>
