@@ -3,11 +3,11 @@ import { BsUpload } from "react-icons/bs";
 import CustomizeTextarea from "../../utils/Input/CustomizeTextarea";
 import loader from "../../assets/icons/loader.svg";
 
-const dataDetail = ({ data, user }) => {
+const ShowProfile = ({ data }) => {
 
 
   return (
-    <div className="bg-white shadow-xl rounded-lg p-6 mb-6 border border-gray-200 ">
+    <div className="bg-white  rounded-lg p-6 mb-6 w-full ">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6">
         <div className="relative group">
           <img
@@ -74,44 +74,8 @@ const dataDetail = ({ data, user }) => {
         </div>
       </div>
 
-      <div className="mt-6">
-        <h4 className="font-semibold text-gray-800 mb-2">Images</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-          <div className="relative group">
-            <img
-              src={data.img}
-              alt="Profile"
-              className="h-52 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
-            />
-            <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
-              Profile
-            </span>
-          </div>
-          <div className="relative group">
-            <img
-              src={data.idCardFront}
-              alt="ID Card Front"
-              className="h-52 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
-            />
-            <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
-              ID Front
-            </span>
-          </div>
-          <div className="relative group">
-            <img
-              src={data.idCardBack}
-              alt="ID Card Back"
-              className="h-52 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
-            />
-            <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
-              ID Back
-            </span>
-          </div>
-        </div>
-      </div>
-
     </div>
   );
 };
 
-export default dataDetail;
+export default ShowProfile;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import CustomizeInput from "../../utils/Input/CustomizeInput";
 import CustomizeTextArea from "../../utils/Input/CustomizeTextarea";
@@ -10,10 +10,15 @@ import loader from "../../assets/icons/loader.svg";
 import { BsUpload } from "react-icons/bs";
 import { taskSchema } from "../../schemas";
 import upload from "../../libs/upload";
+import axios from "axios";
 
 const AddTask = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedAssignee, setSelectedAssignee] = useState(null);
+  const [loadingAssignee, setLoadingAssignee] = useState(false);
+  const [assigneeQuery, setAssigneeQuery] = useState(""); // New state for search query
   const initialValues = {
     title: "",
     desc: "",
@@ -90,6 +95,35 @@ const AddTask = () => {
     setFieldValue("files", updatedFiles);
   }
 
+  const handleAssigneeSearch = async (event) => {
+    const query = event.target.value;
+    setAssigneeQuery(query); // Update search query state
+    console.log("Search Query:", query); // Debugging statement
+
+    if (query.length > 2) {
+      setLoadingAssignee(true);
+      try {
+        const response = await axios.get(`http://localhost:8000/api/user?search=${query}`);
+        setSearchResults(response.data.users);
+        console.log("Search Results:", response.data);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      } finally {
+        setLoadingAssignee(false);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectAssignee = (assignee) => {
+    setSelectedAssignee(assignee);
+    setFieldValue("assignee", assignee._id);
+    console.log(assignee._id); // Store the ID of the selected user
+    setAssigneeQuery(assignee.username); // Update search query with selected assignee's username
+    setSearchResults([]);
+  };
+
   return (
     <div className="py-10 ml-[300px]">
       <div className="contain">
@@ -138,14 +172,36 @@ const AddTask = () => {
                 labelClassName="text-sm font-medium text-darkColor"
                 type="text"
                 name="assignee"
-                value={values.assignee}
-                onChange={handleChange}
+                value={assigneeQuery} // Use search query state for input value
+                onChange={handleAssigneeSearch}
                 onBlur={handleBlur}
                 error={getError("assignee")}
                 id="assignee"
                 placeholder="Assignee"
                 className="bg-white  border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
               />
+              {loadingAssignee && <img src={loader} alt="Loading..." className="w-[40px]" />}
+              {assigneeQuery && searchResults.length === 0 && !loadingAssignee && (
+                <p className="mt-2 text-sm text-gray-500">No results found</p>
+              )}
+              {searchResults.length > 0 && (
+                <ul className="border border-gray-300 rounded-md mt-2  max-h-40 overflow-y-auto bg-white">
+                  {searchResults.map((result, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleSelectAssignee(result)}
+                      className="cursor-pointer p-2 hover:bg-gray-200 text-black"
+                    >
+                      {result.username} ({result.email})
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {selectedAssignee && (
+                <div className="mt-2 p-2 border border-gray-300 rounded-md bg-white">
+                  <p>Selected Assignee: {selectedAssignee.username} ({selectedAssignee.email})</p>
+                </div>
+              )}
               <CustomizeInput
                 showLabel={false}
                 htmlFor="deadline"
@@ -175,7 +231,7 @@ const AddTask = () => {
                 id="files"
                 className="hidden"
               />
-              <div className={`flex justify-center items-center flex-wrap gap-4 w-full h-full border h-[136px] rounded-md text-sm text-gray-600 ${touched.files && errors.files ? "border-red-500" : "border-gray-300"}`}>
+              <div className={`flex justify-center items-center flex-wrap gap-4 w-full h-full border rounded-md text-sm text-gray-600 ${touched.files && errors.files ? "border-red-500" : "border-gray-300"}`}>
                 {values.files.length > 0 && (
                   values.files.map((file, index) => (
                     <div key={index} className="relative w-[120px] h-[120px]">

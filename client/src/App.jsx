@@ -23,6 +23,7 @@ import Tasks from "./components/tasks/Tasks";
 import TaskDetails from "./components/taskDetails/TaskDetails";
 import Updater from "./pages/updateTask/updater";
 import UserDetails from "./components/userdetails/userdetails";
+import Profile from "./pages/Profile/Profile";
 
 const App = () => {
   const location = useLocation(); // Get the current route
@@ -40,6 +41,7 @@ const App = () => {
         {authUser && (
           <>
                   <Route path="/dashboard" element={authUser.isVerified ? <Admin /> : <NotFound />} />
+                  <Route path="/dashboard/Profile"  element={authUser.isVerified? <Profile /> : <NotFound />} />  
                   <Route path="/dashboard/users" element={authUser.isAdmin ? <Users /> : <NotFound />} />
                   <Route path="/dashboard/tasks" element={authUser.isVerified ? <Tasks /> : <NotFound />} />
                   <Route path="/dashboard/tasks/:id" element={authUser.isAdmin ? <TaskDetails /> : <NotFound />} />

@@ -181,7 +181,7 @@ const TaskDetail = ({ task }) => {
           id="files"
           className="hidden"
         />
-        <div className="flex justify-center items-center flex-wrap gap-4 w-full h-full border h-[136px] rounded-md text-sm text-gray-600 mt-2">
+        <div className="flex justify-center items-center flex-wrap gap-4 w-full h-full border rounded-md text-sm text-gray-600 mt-2">
           {files.map((file, index) => (
             <div key={index} className="relative w-[120px] h-[120px]">
               <img

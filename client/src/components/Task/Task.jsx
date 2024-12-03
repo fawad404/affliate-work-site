@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import Avatar from "../../assets/icons/avatar.jpg";
 import Modal from "../modal/Modal";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "../../stores"; // Added import
+import useAuthStore from "../../stores";
 
-const Task = () => { // Removed users prop
+const Task = () => {
   const navigate = useNavigate();
   const { authUser } = useAuthStore();
   const [tasks, setTasks] = useState([]);
@@ -16,7 +16,7 @@ const Task = () => { // Removed users prop
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const endpoint = authUser.role === 'admin' 
+        const endpoint = authUser.isAdmin === true
           ? 'http://localhost:8000/api/task' 
           : `http://localhost:8000/api/task/assigned/${authUser._id}`;
         const response = await fetch(endpoint);
