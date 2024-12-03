@@ -200,7 +200,7 @@ const Navbar = () => {
             </div>
 
             {/* Other Navbar Links */}
-            <div className="cursor-pointer hidden lg:flex">Explore</div>
+            <a href="/about"><div className="cursor-pointer hidden lg:flex">About</div></a>
             <div className="items-center gap-2 cursor-pointer hidden lg:flex">
               <span><TfiWorld /></span> English
             </div>

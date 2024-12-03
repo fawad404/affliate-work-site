@@ -76,7 +76,7 @@ const MobileSidebar = ({ show, setShow, setLoginModal }) => {
           Browser Categories
         </p>
         <p className="cursor-pointer text-gray-400 text-base font-medium">
-          Explore
+          About
         </p>
         <NavLink to="/" className={`text-base font-semibold text-gray-400`}>
           Fiverr Business

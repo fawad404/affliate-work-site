@@ -5,19 +5,25 @@ import upload from "../../libs/upload";
 import { BsUpload } from "react-icons/bs";
 import CustomizeInput from "../../utils/Input/CustomizeInput";
 import loader from "../../assets/icons/loader.svg";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-const TaskDetail = ({ task }) => {
+const TaskDetail = ({ task, refetchTask }) => {
   const { id } = useParams();
-  const [desc, setdesc] = useState("");
-  const [files, setFiles] = useState([]);
+  const navigate = useNavigate();
+  const [desc, setdesc] = useState(task.desc || "");
+  const [files, setFiles] = useState(task.files || []);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    console.log("Task ID:", id);
     if (task.files) {
       setFiles(task.files);
     }
+    if (task.desc) {
+      setdesc(task.desc);
+    }
+  }, [task.files, task.desc]);
+
+  useEffect(() => {
     const fetchSubmittedTask = async () => {
       try {
         const res = await Axios.get(`http://localhost:8000/api/submitedTask/${id}`);
@@ -30,7 +36,7 @@ const TaskDetail = ({ task }) => {
       }
     };
     fetchSubmittedTask();
-  }, [id, task.files]);
+  }, [id, refetchTask]);
 
   const renderFilePreview = (fileUrl) => {
     const extension = fileUrl.split(".").pop();
@@ -110,6 +116,12 @@ const TaskDetail = ({ task }) => {
       });
       // Update the files state with the new file URLs
       setFiles(fileUrls);
+      // Refetch the task data
+      refetchTask();
+      // Redirect to /dashboard/tasks after 5 seconds
+      setTimeout(() => {
+        navigate("/dashboard/tasks");
+      }, 4000);
     } catch (error) {
       toast.error(error?.response?.data || error?.response?.message || error.message, {
         position: "bottom-right",

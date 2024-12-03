@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Avatar from "../../assets/icons/avatar.jpg";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios'; // Ensure axios is imported
+import { toast } from 'react-toastify';
 
 const User = ({users}) => {
   const navigate = useNavigate();
@@ -33,11 +35,37 @@ const User = ({users}) => {
   const handleSeeUser = (userId) => {
     navigate(`/dashboard/user/${userId}`);
   }
-      
+  const handleDelete = async (userId, isAdmin) => {
+    if (isAdmin) {
+      toast.error("Admin users cannot be deleted.", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+      return;
+    }
+    try {
+      await Axios.delete(`http://localhost:8000/api/user/${userId}`);
+      toast.success("User deleted successfully.", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+      // Optionally, you can refresh the user list here
+    } catch (error) {
+      toast.error("There was an error deleting the user!", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+      console.error("There was an error deleting the user!", error);
+    }
+  };
+
   return (
     <section className="py-8 mt-8">
-    <div className="container px-0 md:px-4" >
-      <div className="p-4 mb-6 bg-white shadow rounded overflow-x-auto">
+    <div className=" px-0 md:px-4" >
+      <div className="p-4 mb-6 bg-white shadow rounded">
       <table className="table-auto w-full">
   <thead>
     <tr className="text-xs text-gray-500 text-left">
@@ -99,7 +127,7 @@ const User = ({users}) => {
                             </li>
                             <li
                               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                              onClick={() => console.log("Delete", data._id)}
+                              onClick={() => handleDelete(data._id, data.isAdmin)}
                             >
                               Delete
                             </li>

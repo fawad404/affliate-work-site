@@ -55,14 +55,17 @@ const UpdateTask = () => {
         updatedTask
       );
 
+      // Display success toast immediately
       toast.success(res?.data , {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
 
-      // Redirect to dashboard or tasks page
-      navigate("/dashboard");
+      // Delay navigation by 4 seconds
+      setTimeout(() => {
+        navigate("/dashboard/tasks");
+      }, 4000);
     } catch (error) {
       toast.error(error?.response?.data || error?.response?.message, {
         position: "bottom-right",
@@ -201,7 +204,7 @@ const UpdateTask = () => {
                   id="files"
                   className="hidden"
                 />
-                <div className="flex justify-center items-center flex-wrap gap-4 w-full h-full border h-[136px] rounded-md text-sm text-gray-600">
+                <div className="flex justify-center items-center flex-wrap gap-4 w-full h-full border rounded-md text-sm text-gray-600">
                   {values.files.map((file, index) => (
                     <div key={index} className="relative w-[120px] h-[120px]">
                       <img

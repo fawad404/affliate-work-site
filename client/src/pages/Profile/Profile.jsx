@@ -12,13 +12,15 @@ const Profile = () => {
         <div className='flex max-lg:flex-col'>
             <FloatingWhatsApp />
             <Sidebar />
-            {authUser ? (
-                <ShowProfile data={authUser} />
-            ) : (
-                <p className="text-xl md:text-2xl text-red-400 font-normal">
-                    Error : User not found
-                </p>
-            )}
+            <div className='flex-1 p-4'>
+                {authUser ? (
+                    <ShowProfile data={authUser} />
+                ) : (
+                    <p className="text-xl md:text-2xl text-red-400 font-normal">
+                        Error : User not found
+                    </p>
+                )}
+            </div>
         </div>
     )
 }

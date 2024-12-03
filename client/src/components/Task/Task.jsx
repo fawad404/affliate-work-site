@@ -4,42 +4,27 @@ import Modal from "../modal/Modal";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../stores";
 
-const Task = () => {
+const Task = ({ tasks }) => {
   const navigate = useNavigate();
   const { authUser } = useAuthStore();
-  const [tasks, setTasks] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   console.log("AuthUser:", authUser);
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const endpoint = authUser.isAdmin === true
-          ? 'http://localhost:8000/api/task' 
-          : `http://localhost:8000/api/task/assigned/${authUser._id}`;
-        const response = await fetch(endpoint);
-        console.log("Response:", response, "AuthUser:", authUser._id);
-        const data = await response.json();
-        if (data.tasks && data.tasks.length > 0) {
-          setTasks(data.tasks);
-        } else {
-          setTasks(null);
-        }
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-        setTasks(null);
-      }
-    };
-
-    if (authUser) {
-      fetchTasks();
-    }
-  }, [authUser]);
-
   const toggleDropdown = (id) => {
     setDropdownOpen((prevId) => (prevId === id ? null : id));
+  };
+
+  const calculateRemainingDays = (deadline) => {
+    const currentDate = new Date();
+    const deadlineDate = new Date(deadline);
+    const timeDiff = deadlineDate - currentDate;
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    if (daysDiff < 0) {
+      return `${Math.abs(daysDiff)} day${Math.abs(daysDiff) > 1 ? 's' : ''} exceeded`;
+    }
+    return `${daysDiff} day${daysDiff > 1 ? 's' : ''}`;
   };
 
   useEffect(() => {
@@ -70,8 +55,8 @@ const Task = () => {
   return (
     <section className="py-8 mt-8">
       <div className="container px-0 md:px-4">
-        <div className="p-4 mb-6 bg-white shadow rounded overflow-x-auto">
-          {tasks === null ? (
+        <div className="p-4 mb-6 bg-white shadow rounded">
+          {tasks.length === 0 ? (
             <div className="flex justify-center items-center h-64">
               <div className="bg-gray-100 p-6 rounded shadow-md text-center">
                 <p className="text-lg font-medium text-gray-700">No tasks found or not assigned to you!</p>
@@ -115,7 +100,11 @@ const Task = () => {
                       </span>
                     </td>
                     <td className="py-5 px-6 font-medium hidden md:table-cell">
-                      <button>{data.deadline ? data.deadline : "null"}</button>
+                      <button
+                        className={calculateRemainingDays(data.deadline).includes('exceeded') ? "text-red-500" : ""}
+                      >
+                        {data.deadline ? calculateRemainingDays(data.deadline) : "null"}
+                      </button>
                     </td>
                     <td className="py-5 pl-3 md:px-6 relative">
                       <button

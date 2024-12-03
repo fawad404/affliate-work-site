@@ -7,7 +7,7 @@ const dataDetail = ({ data, user }) => {
 
 
   return (
-    <div className="bg-white shadow-xl rounded-lg p-6 mb-6 border border-gray-200 ">
+    <div className="bg-white  rounded-lg p-6 mb-6">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6">
         <div className="relative group">
           <img
@@ -81,7 +81,7 @@ const dataDetail = ({ data, user }) => {
             <img
               src={data.img}
               alt="Profile"
-              className="h-52 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
+              className="h-64 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
             />
             <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
               Profile
@@ -91,7 +91,7 @@ const dataDetail = ({ data, user }) => {
             <img
               src={data.idCardFront}
               alt="ID Card Front"
-              className="h-52 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
+              className="h-64 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
             />
             <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
               ID Front
@@ -101,7 +101,7 @@ const dataDetail = ({ data, user }) => {
             <img
               src={data.idCardBack}
               alt="ID Card Back"
-              className="h-52 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
+              className="h-64 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
             />
             <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
               ID Back

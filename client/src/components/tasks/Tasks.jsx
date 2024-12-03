@@ -7,6 +7,7 @@ import FloatingWhatsApp from '../../components/FloatingWhatsApp/FloatingWhatsApp
 import Sidebar from '../Sidebar/Sidebar';
 import Task from '../Task/Task';
 import loader from "../../assets/icons/loader.svg"; 
+import useAuthStore from "../../stores";
 
 const Tasks = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const Tasks = () => {
 
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [limit, setLimit] = useState(initialLimit);
+  const { authUser } = useAuthStore();
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
@@ -27,10 +29,13 @@ const Tasks = () => {
   }, [location.search]);
 
   const { isLoading, error, data } = useQuery({
-    queryKey: ["tasks", currentPage, limit],
+    queryKey: ["tasks", currentPage, limit, authUser],
     queryFn: () => {
-      console.log(`Fetching tasks with limit: ${limit}, page: ${currentPage}`);
-      return Axios.get(`http://localhost:8000/api/task?page=${currentPage}&limit=${limit}`).then((res) => res.data);
+      const endpoint = authUser.isAdmin
+        ? `http://localhost:8000/api/task?page=${currentPage}&limit=${limit}`
+        : `http://localhost:8000/api/task/assigned/${authUser._id}`;
+      console.log(`Fetching tasks from: ${endpoint}`);
+      return Axios.get(endpoint).then((res) => res.data);
     },
     keepPreviousData: true, 
   });
@@ -72,28 +77,26 @@ const Tasks = () => {
           Error: Something went wrong
         </p>
       ) : (
-        <>
-          <FloatingWhatsApp />
-          <div>
-            <Sidebar />
-            <div className='ml-0 lg:ml-[16%]'>
-              <Task />
-              {data?.tasks?.length > 0 && (
-                <div className="mt-4">
-                  <PaginationControls
-                    totalPages={totalPages}
-                    currentPage={currentPage}
-                    perPage={limit}
-                    onNext={handleNext}
-                    onPrevious={handlePrevious}
-                    onPageChange={handlePageChange}
-                    onLimitChange={handleLimitChange}
-                  />
-                </div>
-              )}
+        <div className="flex max-lg:flex-col">
+          <Sidebar />
+          <div className="flex-1">
+            <FloatingWhatsApp />
+            <div className='flex flex-col'>
+              <Task tasks={data?.tasks || []} />
+              <div className="mt-4">
+                <PaginationControls
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  perPage={limit}
+                  onNext={handleNext}
+                  onPrevious={handlePrevious}
+                  onPageChange={handlePageChange}
+                  onLimitChange={handleLimitChange}
+                />
+              </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );

@@ -34,14 +34,15 @@ const UserDetails = () => {
                     Error : Something went wrong
                 </p>
             ) : (
-                <div className="">
+                <div className="relative">
                     <FloatingWhatsApp />
                     <div className="flex max-lg:flex-col">
                         {/* Sidebar */}
                         <Sidebar />
                         {/* Ensure data is passed correctly */}
-                        {/* <UserDetail user={data} /> */}
-                        <UserDetail data={data} />
+                        <div className="flex-1">
+                            <UserDetail data={data} />
+                        </div>
                     </div>
                 </div>
             )}

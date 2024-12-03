@@ -13,7 +13,7 @@ const Users = () => {
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
   const initialPage = parseInt(query.get('page') || '1');
-  const initialLimit = parseInt(query.get('per_page') || '2');
+  const initialLimit = parseInt(query.get('per_page') || '1');
 
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [limit, setLimit] = useState(initialLimit);
@@ -21,7 +21,7 @@ const Users = () => {
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const page = parseInt(query.get('page') || '1');
-    const perPage = parseInt(query.get('per_page') || '2');
+    const perPage = parseInt(query.get('per_page') || '1');
     setCurrentPage(page);
     setLimit(perPage);
   }, [location.search]);
@@ -73,10 +73,12 @@ const Users = () => {
         </p>
       ) : (
         <>
-          <FloatingWhatsApp />
-          <div>
+          <div className='flex max-lg:flex-col'>
             <Sidebar />
-            <div className='ml-0 lg:ml-[16%]'>
+            <div className='flex-1'>
+              <FloatingWhatsApp />
+              <div className='flex flex-col'>
+
               <User users={data.users} />
               <div className="mt-4">
                 <PaginationControls
@@ -87,8 +89,9 @@ const Users = () => {
                   onPrevious={handlePrevious}
                   onPageChange={handlePageChange}
                   onLimitChange={handleLimitChange}
-                />
+                  />
               </div>
+                  </div>
             </div>
           </div>
         </>

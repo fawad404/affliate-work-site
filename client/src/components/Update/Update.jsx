@@ -1,9 +1,11 @@
 import React from 'react'
-
+import Sidebar from "../../components/Sidebar/Sidebar";
+import UserUpdate from "../../components/UserUpdate/UserUpdate";
 const Update = () => {
   return (
     <div>
-      update page available
+      <Sidebar />
+      <UserUpdate />
     </div>
   )
 }

@@ -24,6 +24,8 @@ import TaskDetails from "./components/taskDetails/TaskDetails";
 import Updater from "./pages/updateTask/updater";
 import UserDetails from "./components/userdetails/userdetails";
 import Profile from "./pages/Profile/Profile";
+import About from "./pages/about/About";
+
 
 const App = () => {
   const location = useLocation(); // Get the current route
@@ -53,6 +55,7 @@ const App = () => {
           </>
         )}
         <Route path="/gigs" element={<Gigs />} />
+        <Route path="/about" element={<About />} />
         <Route path="/gigs/:id" element={<Gig />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/myGigs" element={<MyGigs />} />

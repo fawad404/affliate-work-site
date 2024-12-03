@@ -125,7 +125,7 @@ const AddTask = () => {
   };
 
   return (
-    <div className="py-10 ml-[300px]">
+    <div className="py-10 lg:ml-[300px]">
       <div className="contain">
         <div className="w-full lg:w-[75%] flex items-center flex-col justify-center py-10 mx-auto">
           <form
@@ -181,7 +181,7 @@ const AddTask = () => {
                 className="bg-white  border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
               />
               {loadingAssignee && <img src={loader} alt="Loading..." className="w-[40px]" />}
-              {assigneeQuery && searchResults.length === 0 && !loadingAssignee && (
+              {assigneeQuery && searchResults.length === 0 && !loadingAssignee && !selectedAssignee && (
                 <p className="mt-2 text-sm text-gray-500">No results found</p>
               )}
               {searchResults.length > 0 && (
