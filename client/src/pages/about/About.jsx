@@ -47,24 +47,7 @@ export default function About() {
           </div>
         </section>
       </main>
-      <footer className="bg-muted py-6 px-4 md:px-6">
-        <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <MountainIcon className="h-6 w-6" />
-            <p className="text-sm text-muted-foreground">
-              &copy; 2024 Soft Hawks. All rights reserved.
-            </p>
-          </div>
-          <nav className="flex gap-4">
-            <a href="#" className="text-sm hover:underline underline-offset-4">
-              Terms of Service
-            </a>
-            <a href="#" className="text-sm hover:underline underline-offset-4">
-              Privacy Policy
-            </a>
-          </nav>
-        </div>
-      </footer>
+      
     </div>
   );
 }

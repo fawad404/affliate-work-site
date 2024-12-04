@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Avatar from "../../assets/icons/avatar.jpg";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios'; // Ensure axios is imported
+import { Axios } from '../../config';
 import { toast } from 'react-toastify';
 
 const User = ({users}) => {

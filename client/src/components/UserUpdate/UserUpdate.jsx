@@ -7,7 +7,7 @@ import { Axios } from "../../config";
 import requests from "../../libs/request";
 import { toast } from "react-toastify";
 import loader from "../../assets/icons/loader.svg";
-import { BsUpload } from "react-icons/bs";
+import { BsUpload, BsCheckCircle, BsXCircle } from "react-icons/bs";
 // import { userSchema } from "../../schemas/userSchema";
 import upload from "../../libs/upload";
 
@@ -99,6 +99,8 @@ const UserUpdate = () => {
       desc: userData?.desc || "",
       skills: userData?.skills || [],
       password: "",
+      isVerified: userData?.isVerified || false,
+      isSeller: userData?.isSeller || false,
     },
     enableReinitialize: true, // Reinitialize form values when userData updates
     // validationSchema: userSchema,
@@ -125,6 +127,10 @@ const UserUpdate = () => {
     const updatedFiles = [...values.files];
     updatedFiles.splice(index, 1);
     setFieldValue("files", updatedFiles);
+  };
+
+  const handleToggle = (field) => {
+    setFieldValue(field, !values[field]);
   };
 
   if (!userData) return <div>Loading...</div>; // Loading fallback
@@ -169,6 +175,48 @@ const UserUpdate = () => {
                 placeholder="Password"
                 className="bg-white border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
               />
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <label htmlFor="isVerified" className="text-sm font-medium text-darkColor">
+                    Is Verified
+                  </label>
+                  {values.isVerified ? (
+                    <BsCheckCircle
+                      size={24}
+                      color="green"
+                      onClick={() => handleToggle("isVerified")}
+                      className="cursor-pointer"
+                    />
+                  ) : (
+                    <BsXCircle
+                      size={24}
+                      color="red"
+                      onClick={() => handleToggle("isVerified")}
+                      className="cursor-pointer"
+                    />
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="isSeller" className="text-sm font-medium text-darkColor">
+                    Is Seller
+                  </label>
+                  {values.isSeller ? (
+                    <BsCheckCircle
+                      size={24}
+                      color="green"
+                      onClick={() => handleToggle("isSeller")}
+                      className="cursor-pointer"
+                    />
+                  ) : (
+                    <BsXCircle
+                      size={24}
+                      color="red"
+                      onClick={() => handleToggle("isSeller")}
+                      className="cursor-pointer"
+                    />
+                  )}
+                </div>
+              </div>
               <CustomizeInput
                 showLabel={false}
                 htmlFor="skills"

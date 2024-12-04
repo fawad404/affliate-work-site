@@ -107,6 +107,16 @@ const dataDetail = ({ data, user }) => {
               ID Back
             </span>
           </div>
+          <div className="relative group">
+            <img
+              src={data.liveSelfie}
+              alt="Live Selfie"
+              className="h-64 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
+            />
+            <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
+              Live Selfie
+            </span>
+          </div>
         </div>
       </div>
 

@@ -201,9 +201,11 @@ const Navbar = () => {
 
             {/* Other Navbar Links */}
             <a href="/about"><div className="cursor-pointer hidden lg:flex">About</div></a>
+          <a href="/contact">
             <div className="items-center gap-2 cursor-pointer hidden lg:flex">
-              <span><TfiWorld /></span> English
+              Contact
             </div>
+          </a>
             <span className="hidden lg:flex items-center gap-2 cursor-pointer">
               <span><BsCurrencyDollar /></span> USD
             </span>

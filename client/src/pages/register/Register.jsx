@@ -10,6 +10,8 @@ import loader from "../../assets/icons/loader.svg";
 import { BsUpload } from "react-icons/bs";
 import { registerSchema } from "../../schemas";
 import upload from "../../libs/upload";
+import Webcam from "react-webcam";
+import { AiOutlineCamera } from "react-icons/ai";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -32,18 +34,52 @@ const Register = () => {
     bankIban: null,
     easypaisaAccount: null,
     isSeller: false,
+    liveSelfie: null,
   };
+
+  const handleCapture = (setFieldValue) => {
+    const webcamRef = React.useRef(null);
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
+
+    const capture = React.useCallback(() => {
+      const imageSrc = webcamRef.current.getScreenshot({ format: 'image/jpeg' });
+      const imageBlob = dataURLtoBlob(imageSrc);
+      const imageFile = new File([imageBlob], "liveSelfie.jpg", { type: "image/jpeg" });
+      console.log("Captured image file:", imageFile); // Add this line to log the captured image file
+      setFieldValue("liveSelfie", imageFile);
+      setIsCameraOpen(false);
+    }, [webcamRef, setFieldValue]);
+
+    const dataURLtoBlob = (dataURL) => {
+      const byteString = atob(dataURL.split(',')[1]);
+      const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      return new Blob([ab], { type: mimeString });
+    };
+
+    const openCamera = () => setIsCameraOpen(true);
+    const removeImage = () => setFieldValue("liveSelfie", null);
+
+    return { webcamRef, capture, isCameraOpen, openCamera, removeImage };
+  };
+
   const onSubmit = async (payload, actions) => {
     setLoading(true);
     const url = await upload(values.idCardFront);
     const urlImg = await upload(values.img);
     const urlImgBack = await upload(values.idCardBack);
     const BankImage = await upload(values.bankImg);
+    const LiveSelfie = await upload(values.liveSelfie);
     console.log({payload});
     console.log("Id card front img:", url);
     console.log("url img:", urlImg);
     console.log("url Back img:", urlImgBack);
     console.log("url Back bankImg:", BankImage);
+    console.log("url Back liveSelfie:", LiveSelfie);
     
 
     try {
@@ -53,6 +89,7 @@ const Register = () => {
         idCardFront: url,
         idCardBack: urlImgBack,
         bankImg: BankImage,
+        liveSelfie: LiveSelfie,
       });
       toast.success(res?.data, {
         position: "bottom-right",
@@ -137,6 +174,8 @@ const Register = () => {
       : values.skills.filter((skill) => skill !== value);
     setFieldValue("skills", updatedSkills);
   };
+
+  const { webcamRef, capture, isCameraOpen, openCamera, removeImage } = handleCapture(setFieldValue);
 
   return (
     <div className="py-24 lg:py-40 pb-10">
@@ -324,9 +363,9 @@ const Register = () => {
                   <div className="mt-3">
                     <p className="text-sm text-gray-500">Sample Image:</p>
                     <img
-                      src="/path/to/sample-image.jpg" 
+                      src="../../Sample-Images/Profile-pic-sample.png" 
                       alt="Sample Profile Pic"
-                      className="w-full h-[190px] object-cover border border-gray-300"
+                      className="w-full h-auto object-cover border border-gray-300"
                     />
                   </div>
                 )}
@@ -552,9 +591,9 @@ const Register = () => {
                       <div className="mt-4">
                         <p className="text-sm font-medium text-darkColor">Sample Images:</p>
                         <div className="flex flex-col md:flex-row space-x-4 mt-4">
-                          <img src="sample1.jpg" alt="Sample 1" className="w-32 h-32 rounded"/>
-                          <img src="sample2.jpg" alt="Sample 2" className="w-32 h-32 rounded"/>
-                          <img src="sample3.jpg" alt="Sample 3" className="w-32 h-32 rounded"/>
+                          <img src="../../Sample-Images/Sample1.jpg" alt="Sample 1" className="w-32 h-32 rounded"/>
+                          <img src="../../Sample-Images/Sample2.jpg" alt="Sample 2" className="w-32 h-32 rounded"/>
+                          <img src="../../Sample-Images/Sample3.jpg" alt="Sample 3" className="w-32 h-32 rounded"/>
                         </div>
                       </div>
                     </div>
@@ -608,9 +647,9 @@ const Register = () => {
                   <div className="mt-3">
                     <p className="text-sm text-gray-500">Sample Image:</p>
                     <img
-                      src="/path/to/sample-image.jpg" 
+                      src="../../Sample-Images/Cnic-Sample.png" 
                       alt="Sample ID Card Front"
-                      className="w-full h-[190px] object-cover border border-gray-300"
+                      className="w-full h-64 object-cover border border-gray-300 "
                     />
                   </div>
                 )}
@@ -647,14 +686,67 @@ const Register = () => {
                   <div className="mt-3">
                     <p className="text-sm text-gray-500">Sample Image:</p>
                     <img
-                      src="/path/to/sample-image.jpg" 
+                      src="../../Sample-Images/Cnic-Sample.png" 
                       alt="Sample ID Card Back"
-                      className="w-full h-[190px] object-cover border border-gray-300"
+                      className="w-full h-64 object-cover border border-gray-300"
                     />
                   </div>
                 )}
               </div>
 
+              <div className="w-full">
+                <label className="text-sm font-medium text-darkColor">Live Selfie</label>
+                <div className="flex flex-col items-center">
+                  {isCameraOpen ? (
+                    <>
+                      <Webcam
+                        audio={false}
+                        ref={webcamRef}
+                        screenshotFormat="image/jpeg"
+                        className="w-full h-full object-cover border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={capture}
+                        className="mt-2 bg-primary/80 hover:bg-primary text-white py-2 px-4 rounded"
+                      >
+                        Capture Selfie
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <AiOutlineCamera size={50} className="text-gray-500 cursor-pointer" onClick={openCamera} />
+                      <p className="text-sm text-gray-500 mt-2">Click to start camera</p>
+                    </>
+                  )}
+                  {values.liveSelfie ? (
+                    <div className="mt-3">
+                      <p className="text-sm text-gray-500">Captured Selfie:</p>
+                      <img
+                        src={URL.createObjectURL(values.liveSelfie)}
+                        alt="Live Selfie"
+                        className="w-full h-[200px] object-cover border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="mt-2 bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded"
+                      >
+                        Remove Selfie
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="mt-3">
+                    <p className="text-sm text-gray-500">Sample Image:</p>
+                    <img
+                      src="../../Sample-Images/Live-selfie-sample.jpg" 
+                      alt="Live Sample Pic"
+                      className="w-full h-[500px] object-cover border border-gray-300"
+                    />
+                  </div>
+                  )}
+                </div>
+              </div>
             
             </div>
             <button

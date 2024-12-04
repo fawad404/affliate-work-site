@@ -15,6 +15,8 @@ const TaskDetail = ({ task, refetchTask }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    console.log('Task files updated:', task.files);
+    console.log('Task description updated:', task.desc);
     if (task.files) {
       setFiles(task.files);
     }
@@ -26,7 +28,9 @@ const TaskDetail = ({ task, refetchTask }) => {
   useEffect(() => {
     const fetchSubmittedTask = async () => {
       try {
+        console.log(`Fetching submitted task with ID: ${id}`);
         const res = await Axios.get(`http://localhost:8000/api/submitedTask/${id}`);
+        console.log('Fetched submitted task data:', res.data);
         if (res.data) {
           setdesc(res.data.desc);
           setFiles(res.data.files);
@@ -91,10 +95,12 @@ const TaskDetail = ({ task, refetchTask }) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay to ensure state updates
       const fileUrls = await Promise.all(
         files.map(async (file) => {
           if (file instanceof File) {
             const uploadedFileUrl = await upload(file);
+            console.log('Uploaded file URL:', uploadedFileUrl);
             if (!uploadedFileUrl) {
               throw new Error("File upload failed");
             }
@@ -105,10 +111,8 @@ const TaskDetail = ({ task, refetchTask }) => {
       );
       const payload = { id, desc, files: fileUrls };
       console.log("Payload:", payload);
-      const res = await Axios.post(
-        `http://localhost:8000/api/submitedTask/`,
-        payload
-      );
+      const res = await Axios.post(`http://localhost:8000/api/submitedTask/`, payload);
+      console.log('Submission response:', res.data);
       toast.success(res?.data.message || "Task submitted successfully", {
         position: "bottom-right",
         toastId: 1,
@@ -123,6 +127,7 @@ const TaskDetail = ({ task, refetchTask }) => {
         navigate("/dashboard/tasks");
       }, 4000);
     } catch (error) {
+      console.error('Error during task submission:', error);
       toast.error(error?.response?.data || error?.response?.message || error.message, {
         position: "bottom-right",
         toastId: 1,

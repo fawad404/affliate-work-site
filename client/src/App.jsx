@@ -25,6 +25,7 @@ import Updater from "./pages/updateTask/updater";
 import UserDetails from "./components/userdetails/userdetails";
 import Profile from "./pages/Profile/Profile";
 import About from "./pages/about/About";
+import Contact from "./pages/contact/Contact";
 
 
 const App = () => {
@@ -64,6 +65,7 @@ const App = () => {
         <Route path="/messages/:id" element={<Message />} />
         <Route path="/pay/:id" element={<Pay />} />
         <Route path="/success" element={<Success />} />
+        <Route path="/contact" element={<Contact />} />
       </Routes>
 
       {/* Render Footer only if we're NOT on an /admin route */}

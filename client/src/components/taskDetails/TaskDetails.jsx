@@ -8,11 +8,16 @@ import loader from "../../assets/icons/loader.svg";
 import { useParams } from "react-router-dom";
 
 const fetchTaskById = async (id) => {
-  return Axios.get(`${requests.tasks}/${id}`).then((res) => res.data);
+  console.log(`Fetching task with ID: ${id}`);
+  return Axios.get(`${requests.tasks}/${id}`).then((res) => {
+    console.log('Fetched task data:', res.data);
+    return res.data;
+  });
 };
 
 const TaskDetails = () => {
   const { id } = useParams(); // Extract the ID from the URL
+  console.log(`Task ID from URL: ${id}`);
   const { isLoading, error, data, refetch } = useQuery(
     ["task", id], // Use ID in queryKey
     () => fetchTaskById(id), // Fetch task with the ID
@@ -21,25 +26,8 @@ const TaskDetails = () => {
     }
   );
 
-  // const { isLoading, error, data } = useQuery({
-  //     queryKey: ["tasks"],
-  //     queryFn: () => Axios.get(`${requests.tasks}/`).then((res) => res.data),
-  //   });   
-  console.log(data);
-
-  const task = {
-    _id: "6743aae55f741e7d9a629860",
-    title: "testing task",
-    desc: "testing task desciton",
-    assignee: "6734bee9555bc802f59c22e0",
-    deadline: "2024-11-15T00:00:00.000Z",
-    status: "To Do",
-    files: [
-      "https://res.cloudinary.com/dksanjzg0/raw/upload/v1732487908/g6yksvar7ys5mxnm8yzh.jpg",
-      "https://res.cloudinary.com/dksanjzg0/raw/upload/v1732487908/iyzcbow4pi7vn0smoy5c.jpg",
-      "../../../public/general-solutions.docx",
-    ],
-  };
+  console.log('Query data:', data);
+  console.log('Query error:', error);
 
   return (
     <>
