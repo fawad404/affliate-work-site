@@ -3,6 +3,7 @@ import Avatar from "../../assets/icons/avatar.jpg";
 import Modal from "../modal/Modal";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../stores";
+import { toast } from 'react-toastify'; // Add toast import
 
 const Task = ({ tasks }) => {
   const navigate = useNavigate();
@@ -10,22 +11,40 @@ const Task = ({ tasks }) => {
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  console.log("AuthUser:", authUser);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
+  const [tasksList, setTasksList] = useState(tasks);
 
   const toggleDropdown = (id) => {
     setDropdownOpen((prevId) => (prevId === id ? null : id));
   };
 
   const calculateRemainingDays = (deadline) => {
+    // Parse the deadline, ensuring correct format and time zone
+    const deadlineDate = new Date(deadline); // Assuming deadline is in ISO 8601 format
+    console.log(deadline)
     const currentDate = new Date();
-    const deadlineDate = new Date(deadline);
+  
     const timeDiff = deadlineDate - currentDate;
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    if (daysDiff < 0) {
-      return `${Math.abs(daysDiff)} day${Math.abs(daysDiff) > 1 ? 's' : ''} exceeded`;
+  
+    if (timeDiff < 0) {
+      const daysExceeded = Math.ceil(Math.abs(timeDiff) / (1000 * 3600 * 24));
+      return `${daysExceeded} day${daysExceeded > 1 ? 's' : ''} exceeded`;
     }
-    return `${daysDiff} day${daysDiff > 1 ? 's' : ''}`;
+  
+    const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  
+    // Prioritize displaying hours and minutes for deadlines within 24 hours
+    if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff >= 0) {
+      return `${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''} and ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''} left`;
+    }
+  
+    // For deadlines more than 1 day away, display days
+    return `${daysDiff} day${daysDiff > 1 ? 's' : ''} left`;
   };
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -39,6 +58,10 @@ const Task = ({ tasks }) => {
     };
   }, []);
 
+  useEffect(() => {
+    setTasksList(tasks);
+  }, [tasks]);
+
   const handleEditClick = (taskId) => {
     navigate(`/dashboard/update-task/${taskId}`);
   };
@@ -48,15 +71,48 @@ const Task = ({ tasks }) => {
   };
 
   const handleModalSubmit = (updatedData) => {
-    console.log("Updated User Data:", updatedData);
     setIsModalOpen(false);
+  };
+
+  const handleDeleteClick = (taskId) => {
+    setTaskToDelete(taskId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/task/${taskToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      toast.success("Task deleted successfully.", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+      setTasksList(tasksList.filter(task => task._id !== taskToDelete));
+      setIsDeleteModalOpen(false);
+      setTaskToDelete(null);
+
+    } catch (error) {
+      toast.error("There was an error Deleting the task", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+    }
   };
 
   return (
     <section className="py-8 mt-8">
       <div className="container px-0 md:px-4">
         <div className="p-4 mb-6 bg-white shadow rounded">
-          {tasks.length === 0 ? (
+          {tasksList.length === 0 ? (
             <div className="flex justify-center items-center h-64">
               <div className="bg-gray-100 p-6 rounded shadow-md text-center">
                 <p className="text-lg font-medium text-gray-700">No tasks found or not assigned to you!</p>
@@ -74,7 +130,7 @@ const Task = ({ tasks }) => {
                 </tr>
               </thead>
               <tbody>
-                {tasks.map((data) => (
+                {tasksList.map((data) => (
                   <tr className="text-xs bg-gray-50" key={data._id}>
                     <td className="py-5 px-6 font-medium hidden md:table-cell">{data.title}</td>
                     <td className="py-3 pr-3 md:px-4">
@@ -93,19 +149,22 @@ const Task = ({ tasks }) => {
                     <td className="py-5 pl-6 md:px-6">
                       <span
                         className={`inline-block py-1 px-2 text-white rounded-full cursor-pointer ${
-                          data.status === "To Do" ? "bg-gray-500" : "bg-green-500"
+                          data.status === "In Complete" ? "bg-red-500" :
+                          data.status === "Complete" ? "bg-yellow-500" :
+                          data.status === "To Do" ? "bg-gray-500" :
+                          data.status === "In Progress" ? "bg-green-500" : ""
                         }`}
                       >
                         {data.status}
                       </span>
                     </td>
                     <td className="py-5 px-6 font-medium hidden md:table-cell">
-                      <button
-                        className={calculateRemainingDays(data.deadline).includes('exceeded') ? "text-red-500" : ""}
-                      >
-                        {data.deadline ? calculateRemainingDays(data.deadline) : "null"}
-                      </button>
-                    </td>
+    <button
+      className={calculateRemainingDays(data.deadline).includes('exceeded') ? "text-red-500" : ""}
+    >
+      {data.deadline ? calculateRemainingDays(data.deadline) : "null"}
+    </button>
+  </td>
                     <td className="py-5 pl-3 md:px-6 relative">
                       <button
                         className="text-gray-600 hover:text-gray-900 text-2xl"
@@ -119,18 +178,22 @@ const Task = ({ tasks }) => {
                       {dropdownOpen === data._id && (
                         <div className="dropdown-menu absolute right-0 mt-2 w-28 bg-white border border-gray-200 rounded shadow-md z-10">
                           <ul className="text-sm text-gray-700">
+                            {authUser.isAdmin && (
+                            <>
                             <li
                               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                               onClick={() => handleEditClick(data._id)}
-                            >
+                              >
                               Edit
                             </li>
                             <li
                               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                              onClick={() => console.log("Delete", data._id)}
-                            >
+                              onClick={() => handleDeleteClick(data._id)}
+                              >
                               Delete
                             </li>
+                              </>
+                            )}
                             <li
                               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                               onClick={() => handleSeeTaskClick(data._id)}
@@ -148,6 +211,27 @@ const Task = ({ tasks }) => {
           )}
         </div>
       </div>
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-md">
+            <p>Are you sure you want to delete this task?</p>
+            <div className="mt-4 flex justify-end">
+              <button
+                className="bg-gray-200 px-4 py-2 rounded mr-2"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

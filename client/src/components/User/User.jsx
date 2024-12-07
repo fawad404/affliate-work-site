@@ -9,6 +9,9 @@ const User = ({users}) => {
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [usersList, setUsersList] = useState(users);
 
   const toggleDropdown = (id) => {
     setDropdownOpen((prevId) => (prevId === id ? null : id));
@@ -26,16 +29,17 @@ const User = ({users}) => {
     };
   }, []);
 
-  const handleEditClick = (userId) => {
-    navigate(`/dashboard/update-user/${userId}`)
-    // console.log("handle edit click user is:" , user);
-    // setSelectedUser(user);
-    // setIsModalOpen(true);
-  };
+  useEffect(() => {
+    setUsersList(users);
+  }, [users]);
+
+  // const handleEditClick = (userId) => {
+  //   navigate(`/dashboard/update-user/${userId}`)
+  // };
   const handleSeeUser = (userId) => {
     navigate(`/dashboard/user/${userId}`);
   }
-  const handleDelete = async (userId, isAdmin) => {
+  const handleDeleteClick = (userId, isAdmin) => {
     if (isAdmin) {
       toast.error("Admin users cannot be deleted.", {
         position: "bottom-right",
@@ -44,14 +48,21 @@ const User = ({users}) => {
       });
       return;
     }
+    setUserToDelete(userId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      await Axios.delete(`http://localhost:8000/api/user/${userId}`);
+      await Axios.delete(`http://localhost:8000/api/user/${userToDelete}`);
       toast.success("User deleted successfully.", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
-      // Optionally, you can refresh the user list here
+      setUsersList(usersList.filter(user => user._id !== userToDelete));
+      setIsDeleteModalOpen(false);
+      setUserToDelete(null);
     } catch (error) {
       toast.error("There was an error deleting the user!", {
         position: "bottom-right",
@@ -77,8 +88,8 @@ const User = ({users}) => {
     </tr>
   </thead>
   <tbody>
-    {users && users.length > 0 ? (
-      users.map((data) => (
+    {usersList && usersList.length > 0 ? (
+      usersList.map((data) => (
         <tr className="text-xs bg-gray-50" key={data._id}>
           <td className="py-5 px-6 font-medium hidden md:table-cell">{data._id}</td>
           <td className="py-3 pr-3 md:px-4">
@@ -119,15 +130,15 @@ const User = ({users}) => {
                       {dropdownOpen === data._id && (
                         <div className="dropdown-menu absolute right-0 mt-2 w-28 bg-white border border-gray-200 rounded shadow-md z-10">
                           <ul className="text-sm text-gray-700">
-                            <li
+                            {/* <li
                               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                               onClick={() => handleEditClick(data._id)}
                             >
                               Edit
-                            </li>
+                            </li> */}
                             <li
                               className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                              onClick={() => handleDelete(data._id, data.isAdmin)}
+                              onClick={() => handleDeleteClick(data._id, data.isAdmin)}
                             >
                               Delete
                             </li>
@@ -152,7 +163,27 @@ const User = ({users}) => {
     )}
   </tbody>
 </table>
-
+{isDeleteModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded shadow-md">
+      <p>Are you sure you want to delete this user?</p>
+      <div className="mt-4 flex justify-end">
+        <button
+          className="bg-gray-200 px-4 py-2 rounded mr-2"
+          onClick={() => setIsDeleteModalOpen(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-red-500 text-white px-4 py-2 rounded"
+          onClick={confirmDelete}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
 

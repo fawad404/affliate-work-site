@@ -1,10 +1,47 @@
 import React, { useState } from 'react';
-import { BsUpload } from "react-icons/bs";
+import { BsCheckCircle, BsXCircle } from "react-icons/bs";
 import CustomizeTextarea from "../../utils/Input/CustomizeTextarea";
+import { useNavigate } from "react-router-dom";
 import loader from "../../assets/icons/loader.svg";
+import { Axios } from "../../config";
+import { toast } from "react-toastify";
 
 const dataDetail = ({ data, user }) => {
+  const navigate = useNavigate();
+  const [isVerified, setIsVerified] = useState(data.isVerified);
+  const [loading, setLoading] = useState(false); // Add loading state
 
+  const handleToggle = () => {
+    setIsVerified(!isVerified);
+  };
+
+  const handleUpdate = async () => {
+    setLoading(true);
+    const updatedUser = { ...data, isVerified };
+    try {
+      const res = await Axios.put(
+        `http://localhost:8000/api/user/${data._id}`,
+        updatedUser
+      );
+      toast.success(res?.data || "User Status Updated Successfully", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+      setTimeout(() => {
+        navigate("/dashboard/users");
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data || error?.response?.message, {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white  rounded-lg p-6 mb-6">
@@ -41,36 +78,29 @@ const dataDetail = ({ data, user }) => {
           <p>
             <span className="font-semibold">IBAN:</span> {data.bankIban}
           </p>
-          <p>
-            <span className="font-semibold">Seller:</span>{" "}
-            <span
-              className={`font-bold ${
-                data.isSeller ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {data.isSeller ? "Yes" : "No"}
-            </span>
-          </p>
-          <p>
-            <span className="font-semibold">Admin:</span>{" "}
-            <span
-              className={`font-bold ${
-                data.isAdmin ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {data.isAdmin ? "Yes" : "No"}
-            </span>
-          </p>
-          <p>
-            <span className="font-semibold">Verified:</span>{" "}
-            <span
-              className={`font-bold ${
-                data.isVerified ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {data.isVerified ? "Yes" : "No"}
-            </span>
-          </p>
+         
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <label htmlFor="isVerified" className="text-sm font-medium text-darkColor">
+                Is Verified
+              </label>
+              {isVerified ? (
+                <BsCheckCircle
+                  size={24}
+                  color="green"
+                  onClick={handleToggle}
+                  className="cursor-pointer"
+                />
+              ) : (
+                <BsXCircle
+                  size={24}
+                  color="red"
+                  onClick={handleToggle}
+                  className="cursor-pointer"
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -117,9 +147,29 @@ const dataDetail = ({ data, user }) => {
               Live Selfie
             </span>
           </div>
+          <div className="relative group">
+            <img
+              src={data.bankImg}
+              alt="Bank Image"
+              className="h-64 w-full object-cover rounded-lg border shadow-md group-hover:shadow-lg"
+            />
+            <span className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white font-medium">
+              Bank Image
+            </span>
+          </div>
         </div>
       </div>
-
+      <button
+        type="submit"
+        className="w-[10%] mx-auto bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-3 transition-all duration-300 mt-3"
+        onClick={handleUpdate}
+      >
+        {loading ? (
+          <img src={loader} className="w-6 mx-auto" alt="Loading" />
+        ) : (
+          "Update User"
+        )}
+      </button>
     </div>
   );
 };

@@ -6,7 +6,7 @@ import useAuthStore from '../../stores';
 
 const Profile = () => {
     const { authUser } = useAuthStore(); // Get the logged-in user
-    console.log(authUser); // Ensure authUser is logged correctly
+   
 
     return (
         <div className='flex max-lg:flex-col'>

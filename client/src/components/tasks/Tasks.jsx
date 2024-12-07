@@ -6,7 +6,7 @@ import PaginationControls from "../PaginationControls/PaginationControls";
 import FloatingWhatsApp from '../../components/FloatingWhatsApp/FloatingWhatsApp';
 import Sidebar from '../Sidebar/Sidebar';
 import Task from '../Task/Task';
-import loader from "../../assets/icons/loader.svg"; 
+import loader from "../../assets/icons/loader.svg";
 import useAuthStore from "../../stores";
 
 const Tasks = () => {
@@ -19,6 +19,7 @@ const Tasks = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [limit, setLimit] = useState(initialLimit);
   const { authUser } = useAuthStore();
+  const [status, setStatus] = useState(''); // Default to show all tasks
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
@@ -29,17 +30,15 @@ const Tasks = () => {
   }, [location.search]);
 
   const { isLoading, error, data } = useQuery({
-    queryKey: ["tasks", currentPage, limit, authUser],
+    queryKey: ["tasks", currentPage, limit, authUser, status],
     queryFn: () => {
       const endpoint = authUser.isAdmin
-        ? `http://localhost:8000/api/task?page=${currentPage}&limit=${limit}`
-        : `http://localhost:8000/api/task/assigned/${authUser._id}`;
-      console.log(`Fetching tasks from: ${endpoint}`);
+        ? `http://localhost:8000/api/task?page=${currentPage}&limit=${limit}&status=${status}`
+        : `http://localhost:8000/api/task/assigned/${authUser._id}${status ? `?status=${status}` : ''}`;
       return Axios.get(endpoint).then((res) => res.data);
     },
-    keepPreviousData: true, 
+    keepPreviousData: true,
   });
-  console.log('Data received:', data);
 
   const totalPages = data?.totalPages || 1;
 
@@ -82,7 +81,35 @@ const Tasks = () => {
           <div className="flex-1">
             <FloatingWhatsApp />
             <div className='flex flex-col'>
-              <Task tasks={data?.tasks || []} />
+              <div className="flex justify-between items-center mt-10 ml-auto p-2">
+                <div className="flex flex-col sm:flex-row items-center justify-start gap-4">
+                  <label
+                    htmlFor="status"
+                    className="text-gray-700 font-medium"
+                  >
+                    Filter by Status:
+                  </label>
+                  <select
+                    id="status"
+                    className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none hover:shadow-sm transition duration-200"
+                    value={status}
+                    onChange={(e) => {
+                      const newStatus = e.target.value;
+                      setStatus(newStatus);
+                      navigate(`?page=1&per_page=${limit}&status=${newStatus}`);
+                    }}
+                  >
+                    <option value="" className="text-gray-600">All</option>
+                    <option value="To Do" className="text-gray-600">To Do</option>
+                    <option value="In Progress" className="text-gray-600">In Progress</option>
+                    <option value="Complete" className="text-gray-600">Complete</option>
+                  </select>
+                </div>
+
+              </div>
+              
+                <Task tasks={data?.tasks || []} />
+              
               <div className="mt-4">
                 <PaginationControls
                   totalPages={totalPages}

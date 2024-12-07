@@ -10,21 +10,25 @@ import loader from "../../assets/icons/loader.svg";
 import { BsUpload } from "react-icons/bs";
 import { taskSchema } from "../../schemas";
 import upload from "../../libs/upload";
+import axios from "axios";
 
 const UpdateTask = () => {
   const navigate = useNavigate();
   const { id } = useParams(); // Extract id from the URL
   const [loading, setLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [selectedAssignee, setSelectedAssignee] = useState(null);
+  const [loadingAssignee, setLoadingAssignee] = useState(false);
   const [taskData, setTaskData] = useState(null); // Task data state
+  const [assigneeQuery, setAssigneeQuery] = useState("");
   
   // Fetch task data on component mount
   useEffect(() => {
       const fetchTaskData = async () => {
         try {
-            console.log('task id',id)
         const response = await Axios.get(`http://localhost:8000/api/task/${id}`);
         setTaskData(response.data); // Set fetched task data
-        console.log('task data',response.data)
+        setAssigneeQuery(response.data.assignee.username)
       } catch (error) {
         toast.error("Error fetching task data");
       }
@@ -118,6 +122,39 @@ const UpdateTask = () => {
     updatedFiles.splice(index, 1);
     setFieldValue("files", updatedFiles);
   };
+  
+  const handleAssigneeSearch = async (event) => {
+    const query = event.target.value;
+    setAssigneeQuery(query); // Update search query state
+
+    if (query.length > 2) {
+      setLoadingAssignee(true);
+      try {
+        const response = await axios.get(`http://localhost:8000/api/user?search=${query}`);
+        setSearchResults(response.data.users);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      } finally {
+        setLoadingAssignee(false);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectAssignee = (assignee) => {
+    setSelectedAssignee(assignee);
+    setFieldValue("assignee", assignee._id);
+    setAssigneeQuery(assignee.username); // Update search query with selected assignee's username
+    setSearchResults([]);
+  };
+
+  const handleFileChange = (event) => {
+    const files = Array.from(event.currentTarget.files); // Convert FileList to array
+    setFieldValue("files", [...values.files, ...files]); // Add selected files
+  };
+  
+
 
   if (!taskData) return <div>Loading...</div>; // Loading fallback
 
@@ -167,14 +204,36 @@ const UpdateTask = () => {
                 labelClassName="text-sm font-medium text-darkColor"
                 type="text"
                 name="assignee"
-                value={values.assignee}
-                onChange={handleChange}
+                value={assigneeQuery} // Use search query state for input value
+                onChange={handleAssigneeSearch}
                 onBlur={handleBlur}
                 error={getError("assignee")}
                 id="assignee"
                 placeholder="Assignee"
-                className="bg-white border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
+                className="bg-white  border border-[#C7CBD1] w-full h-[40px] rounded px-4 focus:border-[1.5px] focus:border-primary outline-none text-sm"
               />
+              {loadingAssignee && <img src={loader} alt="Loading..." className="w-[40px]" />}
+              {assigneeQuery && searchResults.length === 0 && !loadingAssignee && !selectedAssignee && (
+                <p className="mt-2 text-sm text-gray-500">No results found</p>
+              )}
+              {searchResults.length > 0 && (
+                <ul className="border border-gray-300 rounded-md mt-2  max-h-40 overflow-y-auto bg-white">
+                  {searchResults.map((result, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleSelectAssignee(result)}
+                      className="cursor-pointer p-2 hover:bg-gray-200 text-black"
+                    >
+                      {result.username} ({result.email})
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {selectedAssignee && (
+                <div className="mt-2 p-2 border border-gray-300 rounded-md bg-white">
+                  <p>Selected Assignee: {selectedAssignee.username} ({selectedAssignee.email})</p>
+                </div>
+              )}
               <CustomizeInput
                 showLabel={false}
                 htmlFor="deadline"
@@ -191,43 +250,56 @@ const UpdateTask = () => {
               />
               {/* File Upload */}
               <div className="w-full h-[300px]">
-                <CustomizeInput
-                  showLabel={false}
-                  htmlFor="files"
-                  label="Upload Files"
-                  labelClassName="text-sm font-medium text-darkColor"
-                  type="file"
-                  name="files"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  multiple
-                  id="files"
-                  className="hidden"
-                />
-                <div className="flex justify-center items-center flex-wrap gap-4 w-full h-full border rounded-md text-sm text-gray-600">
-                  {values.files.map((file, index) => (
-                    <div key={index} className="relative w-[120px] h-[120px]">
-                      <img
-                        src={file instanceof File ? URL.createObjectURL(file) : file}
-                        alt={file.name || file}
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveFile(index)}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                      >
-                        X
-                      </button>
-                    </div>
-                  ))}
-                  <label
-                    htmlFor="files"
-                    className="w-fit border py-2 px-5 rounded-md cursor-pointer"
-                  >
-                    <BsUpload size={20} />
-                  </label>
-                </div>
+              <input
+    type="file"
+    id="files"
+    multiple
+    onChange={handleFileChange}
+    className="hidden"
+  />
+  <div className="flex flex-wrap gap-4 w-full border rounded-md p-4">
+    {values.files.map((file, index) => {
+      const isImage = file instanceof File
+        ? file.type.startsWith("image/")
+        : /\.(jpg|jpeg|png|gif)$/i.test(file);
+
+      const fileName = file instanceof File ? file.name : file.split("/").pop();
+      const fileExtension = fileName.split(".").pop().toUpperCase();
+
+      return (
+        <div key={index} className="relative w-[120px] h-[120px] flex flex-col items-center">
+          {isImage ? (
+            <img
+              src={file instanceof File ? URL.createObjectURL(file) : file}
+              alt={fileName}
+              className="w-full h-full object-cover rounded-md"
+            />
+          ) : (
+            <div className="flex flex-col items-center">
+              <a 
+                href={file instanceof File ? URL.createObjectURL(file) : file}
+                download={fileName}
+                className="text-gray-500 text-xs"
+              >
+                {fileExtension} File
+              </a>
+              {/* <p className="text-gray-500 text-xs">({fileExtension})</p> */}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => handleRemoveFile(index)}
+            className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 py-1 text-xs"
+          >
+            X
+          </button>
+        </div>
+      );
+    })}
+    <label htmlFor="files" className="border py-2 px-5 rounded-md cursor-pointer">
+      <BsUpload size={20} />
+    </label>
+  </div>
               </div>
               <button
                 type="submit"

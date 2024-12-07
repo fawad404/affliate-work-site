@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '../../components/Sidebar/Sidebar';
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "react-router-dom";
+import Axios from "axios";
+import PaginationControls from "../PaginationControls/PaginationControls";
 import FloatingWhatsApp from '../../components/FloatingWhatsApp/FloatingWhatsApp';
-import User from '../../components/User/User';
-import { Axios } from '../../config';
-import { useQuery } from '@tanstack/react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
-import PaginationControls from '../../components/PaginationControls/PaginationControls';
-import loader from "../../assets/icons/loader.svg";
+import Sidebar from '../Sidebar/Sidebar';
+import Task from '../Task/Task';
+import loader from "../../assets/icons/loader.svg"; 
+import useAuthStore from "../../stores";
 
-const Users = () => {
+const MyTasks = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
@@ -17,6 +18,7 @@ const Users = () => {
 
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [limit, setLimit] = useState(initialLimit);
+  const { authUser } = useAuthStore();
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
@@ -27,11 +29,11 @@ const Users = () => {
   }, [location.search]);
 
   const { isLoading, error, data } = useQuery({
-    queryKey: ["users", currentPage, limit],
+    queryKey: ["tasks", currentPage, limit],
     queryFn: () => {
-      return Axios.get(`http://localhost:8000/api/user?page=${currentPage}&limit=${limit}`).then((res) => res.data);
+      return Axios.get(`http://localhost:8000/api/task/assigned/${authUser._id}?page=${currentPage}&limit=${limit}`).then((res) => res.data);
     },
-    keepPreviousData: true,
+    keepPreviousData: true, 
   });
 
   const totalPages = data?.totalPages || 1;
@@ -63,21 +65,19 @@ const Users = () => {
     <>
       {isLoading ? (
         <div className="flex items-center justify-center w-full mt-28">
-          <img src={loader} alt="/" className="w-[40px]" />
+          <img src={loader} alt="Loading..." className="w-[40px]" />
         </div>
       ) : error ? (
         <p className="text-xl md:text-2xl text-red-400 font-normal">
-          Error : Something went wrong
+          Error: Something went wrong
         </p>
       ) : (
-        <>
-          <div className='flex max-lg:flex-col'>
-            <Sidebar />
-            <div className='flex-1'>
-              <FloatingWhatsApp />
-              <div className='flex flex-col'>
-
-              <User users={data.users} />
+        <div className="flex max-lg:flex-col">
+          <Sidebar />
+          <div className="flex-1">
+            <FloatingWhatsApp />
+            <div className='flex flex-col'>
+              <Task tasks={data?.tasks || []} />
               <div className="mt-4">
                 <PaginationControls
                   totalPages={totalPages}
@@ -87,15 +87,14 @@ const Users = () => {
                   onPrevious={handlePrevious}
                   onPageChange={handlePageChange}
                   onLimitChange={handleLimitChange}
-                  />
+                />
               </div>
-                  </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );
-}
+};
 
-export default Users;
+export default MyTasks;

@@ -6,41 +6,31 @@ import { BsUpload } from "react-icons/bs";
 import CustomizeInput from "../../utils/Input/CustomizeInput";
 import loader from "../../assets/icons/loader.svg";
 import { useParams, useNavigate } from "react-router-dom";
-
-const TaskDetail = ({ task, refetchTask }) => {
+import useAuthStore from "../../stores";
+const TaskDetail = ({ task, submittedTask, refetchSubmittedTask }) => {
+  const { authUser } = useAuthStore();
   const { id } = useParams();
   const navigate = useNavigate();
-  const [desc, setdesc] = useState(task.desc || "");
-  const [files, setFiles] = useState(task.files || []);
+  const [desc, setdesc] = useState(submittedTask?.desc || "");
+  const [files, setFiles] = useState(submittedTask?.files || []);
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(task.status || "To Do");
 
   useEffect(() => {
-    console.log('Task files updated:', task.files);
-    console.log('Task description updated:', task.desc);
-    if (task.files) {
-      setFiles(task.files);
+    if (submittedTask?.files) {
+      setFiles(submittedTask.files);
+    }else {
+      setFiles([]);
     }
-    if (task.desc) {
-      setdesc(task.desc);
+    if (submittedTask?.desc) {
+      setdesc(submittedTask.desc);
+    }else{
+      setdesc('');
     }
-  }, [task.files, task.desc]);
-
-  useEffect(() => {
-    const fetchSubmittedTask = async () => {
-      try {
-        console.log(`Fetching submitted task with ID: ${id}`);
-        const res = await Axios.get(`http://localhost:8000/api/submitedTask/${id}`);
-        console.log('Fetched submitted task data:', res.data);
-        if (res.data) {
-          setdesc(res.data.desc);
-          setFiles(res.data.files);
-        }
-      } catch (error) {
-        console.error("Error fetching submitted task:", error);
-      }
-    };
-    fetchSubmittedTask();
-  }, [id, refetchTask]);
+    if (task.status) {
+      setStatus(task.status);
+    }
+  }, [submittedTask?.files, submittedTask?.desc, task.status]);
 
   const renderFilePreview = (fileUrl) => {
     const extension = fileUrl.split(".").pop();
@@ -95,12 +85,10 @@ const TaskDetail = ({ task, refetchTask }) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay to ensure state updates
       const fileUrls = await Promise.all(
         files.map(async (file) => {
           if (file instanceof File) {
             const uploadedFileUrl = await upload(file);
-            console.log('Uploaded file URL:', uploadedFileUrl);
             if (!uploadedFileUrl) {
               throw new Error("File upload failed");
             }
@@ -109,33 +97,77 @@ const TaskDetail = ({ task, refetchTask }) => {
           return file;
         })
       );
-      const payload = { id, desc, files: fileUrls };
-      console.log("Payload:", payload);
-      const res = await Axios.post(`http://localhost:8000/api/submitedTask/`, payload);
-      console.log('Submission response:', res.data);
+  
+      const payload = { id, desc, files: fileUrls, status };
+  
+      let res;
+      if (!submittedTask || Object.keys(submittedTask).length === 0) {
+        // POST request if no data exists in `submittedTask`
+        res = await Axios.post(`http://localhost:8000/api/submitedTask/`, payload);
+      } else {
+        // PUT request if `submittedTask` already contains data
+        res = await Axios.put(
+          `http://localhost:8000/api/submitedTask/${submittedTask._id}`,
+          payload
+        );
+      }
+  
       toast.success(res?.data.message || "Task submitted successfully", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
+  
       // Update the files state with the new file URLs
       setFiles(fileUrls);
-      // Refetch the task data
-      refetchTask();
-      // Redirect to /dashboard/tasks after 5 seconds
-      setTimeout(() => {
-        navigate("/dashboard/tasks");
-      }, 4000);
+  
+      // Refetch the submitted task data
+      refetchSubmittedTask();
+
+      const updatedTask = { status };
+      await Axios.put(`http://localhost:8000/api/task/${id}`, updatedTask);
     } catch (error) {
-      console.error('Error during task submission:', error);
-      toast.error(error?.response?.data || error?.response?.message || error.message, {
-        position: "bottom-right",
-        toastId: 1,
-        autoClose: 1500,
-      });
+      toast.error(
+        error?.response?.data || error?.response?.message || error.message,
+        {
+          position: "bottom-right",
+          toastId: 1,
+          autoClose: 1500,
+        }
+      );
     } finally {
       setLoading(false);
     }
+  };
+  
+  const calculateRemainingTime = (deadline) => {
+    // Parse the deadline, ensuring correct format and time zone
+    const deadlineDate = new Date(deadline); // Assuming deadline is in ISO 8601 format
+    const currentDate = new Date();
+  
+    // Convert current date to Pakistani time (PKT)
+    const pkOffset = 5 * 60; // PKT is UTC+5
+    const localOffset = currentDate.getTimezoneOffset();
+    const pkTime = new Date(currentDate.getTime() + (pkOffset + localOffset) * 60000);
+  
+    const timeDiff = deadlineDate - pkTime;
+  
+    if (timeDiff < 0) {
+      const daysExceeded = Math.ceil(Math.abs(timeDiff) / (1000 * 3600 * 24));
+      return `${daysExceeded} day${daysExceeded > 1 ? 's' : ''} exceeded`;
+    }
+  
+    const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  
+    // Prioritize displaying hours and minutes for deadlines within 24 hours
+    if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff >= 0) {
+      return `${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''} and ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''} left`;
+    }
+  
+    // For deadlines more than 1 day away, display days
+    return `${daysDiff} day${daysDiff > 1 ? 's' : ''} left`;
   };
 
   return (
@@ -143,13 +175,28 @@ const TaskDetail = ({ task, refetchTask }) => {
       <h3 className="text-xl font-bold mb-2">{task.title}</h3>
       <p className="text-gray-700 mb-4">{task.desc}</p>
       <p className="text-sm text-gray-500">
-        <strong>Assignee:</strong> {task.assignee}
+        <strong>Assignee:</strong> {task.assignee.username}
       </p>
       <p className="text-sm text-gray-500">
-        <strong>Deadline:</strong> {new Date(task.deadline).toLocaleDateString()}
+        <strong>Deadline:</strong> {calculateRemainingTime(task.deadline)}
       </p>
       <p className="text-sm text-gray-500">
-        <strong>Status:</strong> {task.status}
+        <strong>Status:</strong>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="ml-2 p-1 border rounded-md"
+        >
+          
+          <option value="To Do">To Do</option>
+          <option value="In Progress">In Progress</option>
+          {authUser.isAdmin && (
+          <>
+            <option value="In Complete">In Complete</option>
+            <option value="Complete">Complete</option>
+          </>
+        )}
+        </select>
       </p>
       <div className="mt-4">
         <h4 className="font-semibold">Files:</h4>
@@ -180,8 +227,10 @@ const TaskDetail = ({ task, refetchTask }) => {
       <div className="mt-4">
         <h4 className="font-semibold">Submit Your Work:</h4>
         <textarea
-          value={desc}
-          onChange={(e) => setdesc(e.target.value)}
+          value={desc ? desc : ''}
+          onChange={(e) => {
+            setdesc(e.target.value);
+          }}
           placeholder="Add a desc..."
           className="w-full p-2 border rounded-md mt-2"
         />

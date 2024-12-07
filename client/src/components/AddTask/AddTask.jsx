@@ -33,7 +33,6 @@ const AddTask = () => {
     try {
       // Assuming `upload` can handle multiple files and returns URLs for each file
       const fileUrls = await Promise.all(values.files.map(file => upload(file)));
-      console.log({...payload, files: fileUrls});
 
      // Send the URLs of the uploaded files along with the rest of the payload data
       const res = await Axios.post(requests.tasks, {
@@ -41,12 +40,14 @@ const AddTask = () => {
         files: fileUrls, // Pass the file URLs to the server
       });
 
-      toast.success(res?.data, {
+      toast.success(res?.data || "Task Created Successfully", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
-      
+      setTimeout(() => {
+        navigate("/dashboard/my-tasks");
+      }, 1500);
     } catch (error) {
       toast.error(error?.response?.data || error?.response?.message, {
         position: "bottom-right",
@@ -98,14 +99,12 @@ const AddTask = () => {
   const handleAssigneeSearch = async (event) => {
     const query = event.target.value;
     setAssigneeQuery(query); // Update search query state
-    console.log("Search Query:", query); // Debugging statement
 
     if (query.length > 2) {
       setLoadingAssignee(true);
       try {
         const response = await axios.get(`http://localhost:8000/api/user?search=${query}`);
         setSearchResults(response.data.users);
-        console.log("Search Results:", response.data);
       } catch (error) {
         console.error("Error fetching search results:", error);
       } finally {
@@ -119,10 +118,15 @@ const AddTask = () => {
   const handleSelectAssignee = (assignee) => {
     setSelectedAssignee(assignee);
     setFieldValue("assignee", assignee._id);
-    console.log(assignee._id); // Store the ID of the selected user
     setAssigneeQuery(assignee.username); // Update search query with selected assignee's username
     setSearchResults([]);
   };
+
+  function handleFileChange(event) {
+    const files = Array.from(event.currentTarget.files); // Convert FileList to array
+    setFieldValue("files", [...values.files, ...files]); // Append new files to the existing ones
+  }
+  
 
   return (
     <div className="py-10 lg:ml-[300px]">
@@ -218,26 +222,33 @@ const AddTask = () => {
               />
              
              <div className="w-full h-[300px]">
-              <CustomizeInput
+             <CustomizeInput
                 showLabel={false}
                 htmlFor="files"
                 label="Upload Files"
                 labelClassName="text-sm font-medium text-darkColor"
                 type="file"
                 name="files"
-                accept="image/*"
-                onChange={handleImageChange}
-                multiple // Allow selecting multiple files
+                onChange={handleFileChange} // Change function name for clarity
+                multiple
                 id="files"
                 className="hidden"
               />
+
               <div className={`flex justify-center items-center flex-wrap gap-4 w-full h-full border rounded-md text-sm text-gray-600 ${touched.files && errors.files ? "border-red-500" : "border-gray-300"}`}>
                 {values.files.length > 0 && (
                   values.files.map((file, index) => (
                     <div key={index} className="relative w-[120px] h-[120px]">
-                      <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover rounded-md" />
-                      <button type="button" onClick={() => handleRemoveFile(index)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1">X</button>
-                    </div>
+  {file.type.startsWith("image/") ? (
+    <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-full object-cover rounded-md" />
+  ) : (
+    <div className="w-full h-full flex items-center justify-center border rounded-md bg-gray-100">
+      <p className="text-sm truncate">{file.name}</p>
+    </div>
+  )}
+  <button type="button" onClick={() => handleRemoveFile(index)} className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1">X</button>
+</div>
+
                   ))
                 )}
                   <>

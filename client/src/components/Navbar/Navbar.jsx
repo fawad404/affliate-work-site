@@ -42,7 +42,7 @@ const Navbar = () => {
     "Blog Content Writing",
     "SEO Optimization Tasks",
   ];
-
+  console.log("AuthUser", authUser);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (megaDropdownRef.current && !megaDropdownRef.current.contains(event.target)) {
@@ -229,12 +229,13 @@ const Navbar = () => {
                     openDrop ? "flex" : "hidden"
                   }`}
                 >
+
                   {authUser?.isVerified ? (
                     <>
-                      <NavLink to="/dashboard" className="cursor-pointer w-full text-sm text-darkColor">
+                      <NavLink to="/dashboard/profile" className="cursor-pointer w-full text-sm text-darkColor">
                         Profile
                       </NavLink>
-                      <NavLink to="/dashboard/tasks" className="cursor-pointer w-full text-sm text-darkColor">
+                      <NavLink to="/dashboard/my-tasks" className="cursor-pointer w-full text-sm text-darkColor">
                         Tasks
                       </NavLink>
                     </>

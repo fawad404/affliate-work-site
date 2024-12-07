@@ -16,6 +16,7 @@ import { AiOutlineCamera } from "react-icons/ai";
 const Register = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false); // Add state for popup visibility
   const initialValues = {
     username: "",
     birthdate: null,
@@ -91,13 +92,12 @@ const Register = () => {
         bankImg: BankImage,
         liveSelfie: LiveSelfie,
       });
-      toast.success(res?.data, {
-        position: "bottom-right",
-        toastId: 1,
-        autoClose: 1500,
-      });
-      navigate("/");
+      setShowPopup(true); // Show popup on success
       setLoading(false);
+      setTimeout(() => {
+        setShowPopup(false);
+        navigate("/");
+      }, 3000); // Hide popup after 3 seconds and navigate
     } catch (error) {
       setLoading(false);
       if (error?.response?.data) {
@@ -180,6 +180,82 @@ const Register = () => {
   return (
     <div className="py-24 lg:py-40 pb-10">
       <div className="contain">
+        {showPopup && (
+         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+         <div className="relative bg-white rounded-xl shadow-lg w-[400px] overflow-hidden">
+           {/* Gradient Header */}
+           <div className="bg-gradient-to-b from-blue-500 to-blue-300 h-[120px] flex items-center justify-center relative">
+             <div className="bg-white w-[64px] h-[64px] flex items-center justify-center rounded-full shadow-md">
+               <svg
+                 width="32"
+                 height="32"
+                 viewBox="0 0 32 32"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg"
+               >
+                 <path
+                   d="M16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0ZM22.9333 12.5333L14.4 21.0667C14.1467 21.32 13.7867 21.4667 13.4 21.4667C13.0133 21.4667 12.6533 21.32 12.4 21.0667L9.06667 17.7333C8.56 17.2267 8.56 16.4 9.06667 15.8933C9.57333 15.3867 10.4 15.3867 10.9067 15.8933L13.4 18.3867L21.0933 10.6933C21.6 10.1867 22.4267 10.1867 22.9333 10.6933C23.44 11.2 23.44 12.0267 22.9333 12.5333Z"
+                   fill="#3A8EF6"
+                 />
+               </svg>
+             </div>
+             {/* Decorative Sparkles */}
+             <div className="absolute inset-0 flex items-center justify-center">
+               <svg
+                 width="150"
+                 height="80"
+                 viewBox="0 0 150 80"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg"
+               >
+                 <path
+                   d="M75 10L70 20H80L75 30L80 40H70L75 50L70 60H80"
+                   stroke="white"
+                   strokeWidth="2"
+                   strokeLinecap="round"
+                 />
+               </svg>
+             </div>
+           </div>
+       
+           {/* Content */}
+           <div className="px-6 py-4 text-center">
+             <h2 className="text-2xl font-bold text-gray-800 mb-2">Congratulations! Registration Succesfull</h2>
+             <p className="text-gray-600 mb-4">
+              Bonus Reward of <strong>1000rs</strong> would be added to your account.
+             </p>
+             <button
+               className="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
+               onClick={() => {
+                 setShowPopup(false);
+                 navigate("/");
+               }}
+             >
+               Done
+             </button>
+             
+           </div>
+       
+           {/* Arrow Decoration */}
+           <div className="absolute bottom-[-12px] left-1/2 transform -translate-x-1/2">
+             <svg
+               width="40"
+               height="20"
+               viewBox="0 0 40 20"
+               fill="none"
+               xmlns="http://www.w3.org/2000/svg"
+             >
+               <path
+                 d="M20 20L40 0H0L20 20Z"
+                 fill="white"
+                 stroke="#E5E7EB"
+               />
+             </svg>
+           </div>
+         </div>
+       </div>
+       
+        )}
         <div className="w-full lg:w-[75%] flex items-center flex-col sm:flex-row justify-center py-10 mx-auto">
           <form
             onSubmit={handleSubmit}

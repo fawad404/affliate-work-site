@@ -41,26 +41,7 @@ const ShowProfile = ({ data }) => {
           <p>
             <span className="font-semibold">IBAN:</span> {data.bankIban}
           </p>
-          <p>
-            <span className="font-semibold">Seller:</span>{" "}
-            <span
-              className={`font-bold ${
-                data.isSeller ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {data.isSeller ? "Yes" : "No"}
-            </span>
-          </p>
-          <p>
-            <span className="font-semibold">Admin:</span>{" "}
-            <span
-              className={`font-bold ${
-                data.isAdmin ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {data.isAdmin ? "Yes" : "No"}
-            </span>
-          </p>
+         
           <p>
             <span className="font-semibold">Verified:</span>{" "}
             <span
