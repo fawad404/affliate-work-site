@@ -4,6 +4,7 @@ import Modal from "../modal/Modal";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../stores";
 import { toast } from 'react-toastify'; // Add toast import
+import { formatDistanceToNow, parseISO } from "date-fns"; // Import date-fns
 
 const Task = ({ tasks }) => {
   const navigate = useNavigate();
@@ -20,29 +21,16 @@ const Task = ({ tasks }) => {
   };
 
   const calculateRemainingDays = (deadline) => {
-    // Parse the deadline, ensuring correct format and time zone
-    const deadlineDate = new Date(deadline); // Assuming deadline is in ISO 8601 format
-    console.log(deadline)
+    const deadlineDate = parseISO(deadline); // Parse the deadline using date-fns
     const currentDate = new Date();
-  
-    const timeDiff = deadlineDate - currentDate;
-  
-    if (timeDiff < 0) {
-      const daysExceeded = Math.ceil(Math.abs(timeDiff) / (1000 * 3600 * 24));
-      return `${daysExceeded} day${daysExceeded > 1 ? 's' : ''} exceeded`;
+
+    if (currentDate > deadlineDate) {
+      const daysExceeded = formatDistanceToNow(deadlineDate, { addSuffix: true });
+      return `${daysExceeded} exceeded`;
     }
-  
-    const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
-    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  
-    // Prioritize displaying hours and minutes for deadlines within 24 hours
-    if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff >= 0) {
-      return `${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''} and ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''} left`;
-    }
-  
-    // For deadlines more than 1 day away, display days
-    return `${daysDiff} day${daysDiff > 1 ? 's' : ''} left`;
+
+    const remainingTime = formatDistanceToNow(deadlineDate, { addSuffix: true });
+    return `${remainingTime} left`;
   };
 
 

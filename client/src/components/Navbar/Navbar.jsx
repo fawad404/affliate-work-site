@@ -42,7 +42,7 @@ const Navbar = () => {
     "Blog Content Writing",
     "SEO Optimization Tasks",
   ];
-  console.log("AuthUser", authUser);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (megaDropdownRef.current && !megaDropdownRef.current.contains(event.target)) {
@@ -121,7 +121,11 @@ const Navbar = () => {
       });
       navigate("/");
     } catch (error) {
-      console.log(error);
+     toast.error(error?.response?.data || "Something went wrong", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1000,
+      });
     }
   };
 

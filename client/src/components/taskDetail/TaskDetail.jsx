@@ -7,6 +7,8 @@ import CustomizeInput from "../../utils/Input/CustomizeInput";
 import loader from "../../assets/icons/loader.svg";
 import { useParams, useNavigate } from "react-router-dom";
 import useAuthStore from "../../stores";
+import { formatDistanceToNow, parseISO } from "date-fns"; // Import date-fns
+
 const TaskDetail = ({ task, submittedTask, refetchSubmittedTask }) => {
   const { authUser } = useAuthStore();
   const { id } = useParams();
@@ -141,53 +143,66 @@ const TaskDetail = ({ task, submittedTask, refetchSubmittedTask }) => {
   };
   
   const calculateRemainingTime = (deadline) => {
-    // Parse the deadline, ensuring correct format and time zone
-    const deadlineDate = new Date(deadline); // Assuming deadline is in ISO 8601 format
+    const deadlineDate = parseISO(deadline); // Parse the deadline using date-fns
     const currentDate = new Date();
-  
-    // Convert current date to Pakistani time (PKT)
-    const pkOffset = 5 * 60; // PKT is UTC+5
-    const localOffset = currentDate.getTimezoneOffset();
-    const pkTime = new Date(currentDate.getTime() + (pkOffset + localOffset) * 60000);
-  
-    const timeDiff = deadlineDate - pkTime;
-  
-    if (timeDiff < 0) {
-      const daysExceeded = Math.ceil(Math.abs(timeDiff) / (1000 * 3600 * 24));
-      return `${daysExceeded} day${daysExceeded > 1 ? 's' : ''} exceeded`;
+
+    if (currentDate > deadlineDate) {
+      const daysExceeded = formatDistanceToNow(deadlineDate, { addSuffix: true });
+      return `${daysExceeded} exceeded`;
     }
-  
-    const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
-    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-  
-    // Prioritize displaying hours and minutes for deadlines within 24 hours
-    if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff >= 0) {
-      return `${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''} and ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''} left`;
+
+    const remainingTime = formatDistanceToNow(deadlineDate, { addSuffix: true });
+    return `${remainingTime} left`;
+  };
+
+  const handleStatusChange = async (newStatus) => {
+    setLoading(true);
+    try {
+      const updatedTask = { status: newStatus };
+      await Axios.put(`http://localhost:8000/api/task/${id}`, updatedTask);
+      setStatus(newStatus);
+      toast.success("Status updated successfully", {
+        position: "bottom-right",
+        toastId: 1,
+        autoClose: 1500,
+      });
+    } catch (error) {
+      toast.error(
+        error?.response?.data || error?.response?.message || error.message,
+        {
+          position: "bottom-right",
+          toastId: 1,
+          autoClose: 1500,
+        }
+      );
+    } finally {
+      setLoading(false);
     }
-  
-    // For deadlines more than 1 day away, display days
-    return `${daysDiff} day${daysDiff > 1 ? 's' : ''} left`;
   };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-      <h3 className="text-xl font-bold mb-2">{task.title}</h3>
+      <h3 className="text-2xl font-bold mb-4">{task.title}</h3>
       <p className="text-gray-700 mb-4">{task.desc}</p>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 mb-2">
         <strong>Assignee:</strong> {task.assignee.username}
       </p>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 mb-2">
         <strong>Deadline:</strong> {calculateRemainingTime(task.deadline)}
       </p>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 mb-4">
         <strong>Status:</strong>
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          onChange={(e) => {
+            const newStatus = e.target.value;
+            setStatus(newStatus);
+            if (authUser.isAdmin) {
+              handleStatusChange(newStatus);
+            }
+          }}
           className="ml-2 p-1 border rounded-md"
         >
-          
           <option value="To Do">To Do</option>
           <option value="In Progress">In Progress</option>
           {authUser.isAdmin && (
@@ -199,8 +214,8 @@ const TaskDetail = ({ task, submittedTask, refetchSubmittedTask }) => {
         </select>
       </p>
       <div className="mt-4">
-        <h4 className="font-semibold">Files:</h4>
-        <div className="grid grid-cols-3 gap-4 mt-2">
+        <h4 className="font-semibold mb-2">Files:</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-2">
           {task.files.map((file, index) => (
             <div key={index} className="relative block border rounded-md overflow-hidden hover:shadow-lg">
               <a
@@ -225,7 +240,7 @@ const TaskDetail = ({ task, submittedTask, refetchSubmittedTask }) => {
         </div>
       </div>
       <div className="mt-4">
-        <h4 className="font-semibold">Submit Your Work:</h4>
+        <h4 className="font-semibold mb-2">Submit Your Work:</h4>
         <textarea
           value={desc ? desc : ''}
           onChange={(e) => {
@@ -273,7 +288,7 @@ const TaskDetail = ({ task, submittedTask, refetchSubmittedTask }) => {
         </div>
         <button
           onClick={handleSubmit}
-          className="bg-primary/80 hover:bg-prima ry cursor-pointer outline-none text-white rounded py-3 px-4 transition-all duration-300 mt-3"
+          className="bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-3 px-4 transition-all duration-300 mt-3"
         >
           {loading ? (
             <img src={loader} className="w-6 mx-auto" alt="Loading" />

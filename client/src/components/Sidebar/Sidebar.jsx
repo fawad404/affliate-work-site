@@ -34,7 +34,10 @@ const Sidebar = () => {
                 </li>
               )}
 
-{authUser.isVerified && (
+
+
+              {authUser.isAdmin && (
+                <>
                 <li className="mt-6">
                   <a className="flex items-center pl-3 py-3 pr-4 text-gray-50 bg-indigo-500 rounded" href="/dashboard/create-task">
                     <span className="inline-block mr-3">
@@ -50,10 +53,6 @@ const Sidebar = () => {
                     </span>
                   </a>
                 </li>
-              )}
-
-              {authUser.isAdmin && (
-                <>
                   <li className="mt-6">
                     <a className="flex items-center pl-3 py-3 pr-4 text-gray-50 bg-indigo-500 rounded" href="/dashboard/users">
                       <span className="inline-block mr-3">

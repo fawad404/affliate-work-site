@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import loader from "../../assets/icons/loader.svg";
 import { Axios } from "../../config";
 import { toast } from "react-toastify";
+import useAuthStore from '../../stores'; // Import authStore
 
 const dataDetail = ({ data, user }) => {
   const navigate = useNavigate();
+  const { setAuthUser } = useAuthStore(); // Destructure setAuthUser from authStore
   const [isVerified, setIsVerified] = useState(data.isVerified);
   const [loading, setLoading] = useState(false); // Add loading state
 
@@ -28,6 +30,7 @@ const dataDetail = ({ data, user }) => {
         toastId: 1,
         autoClose: 1500,
       });
+      setAuthUser({ ...data, isVerified }); // Update authStore
       setTimeout(() => {
         navigate("/dashboard/users");
       }, 1500);

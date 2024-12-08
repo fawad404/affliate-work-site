@@ -102,6 +102,7 @@ const Tasks = () => {
                     <option value="" className="text-gray-600">All</option>
                     <option value="To Do" className="text-gray-600">To Do</option>
                     <option value="In Progress" className="text-gray-600">In Progress</option>
+                    <option value="In Complete" className="text-gray-600">InComplete</option>
                     <option value="Complete" className="text-gray-600">Complete</option>
                   </select>
                 </div>

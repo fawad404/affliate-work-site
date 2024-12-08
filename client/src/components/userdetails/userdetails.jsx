@@ -22,7 +22,7 @@ const UserDetails = () => {
             enabled: !!id, // Ensure query runs only if ID exists
         }
     );
-    console.log(data); // Ensure data is logged correctly
+   
     return (
         <>
             {isLoading ? (
