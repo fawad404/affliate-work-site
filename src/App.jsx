@@ -47,7 +47,7 @@ const App = () => {
                   <Route path="/dashboard" element={authUser.isAdmin ? <Admin /> : <NotFound />} />
                   <Route path="/dashboard/Profile"  element={authUser.isVerified? <Profile /> : <NotFound />} />  
                   <Route path="/dashboard/users" element={authUser.isAdmin ? <Users /> : <NotFound />} />
-                  <Route path="/dashboard/tasks" element={authUser.isVerified ? <Tasks /> : <NotFound />} />
+                  <Route path="/dashboard/tasks" element={<Tasks />} />
                   <Route path="/dashboard/tasks/:id" element={authUser.isVerified ? <TaskDetails /> : <NotFound />} />
                   <Route path="/dashboard/user/:id" element={authUser.isAdmin ? <UserDetails /> : <NotFound />} />
                   <Route path="/dashboard/my-tasks" element={authUser.isVerified ? <MyTasks /> : <NotFound />} />
