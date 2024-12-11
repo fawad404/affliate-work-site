@@ -24,7 +24,7 @@ const Tasks = () => {
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const page = parseInt(query.get('page') || '1');
-    const perPage = parseInt(query.get('per_page') || '1');
+    const perPage = parseInt(query.get('per_page') || '5');
     setCurrentPage(page);
     setLimit(perPage);
   }, [location.search]);
