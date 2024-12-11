@@ -97,9 +97,9 @@ const PaginationControls = ({ totalPages, currentPage, perPage, onNext, onPrevio
           }}
           className="block px-2 py-1 border rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring focus:ring-indigo-500 focus:border-indigo-400 text-sm"
         >
-          <option value={1}>1</option>
-          <option value={3}>3</option>
+          <option value={5}>5</option>
           <option value={20}>20</option>
+          <option value={30}>20</option>
         </select>
       </div>
     </div>
