@@ -9,16 +9,9 @@ import Marketplace from "../../components/HomeComponents/Marketplace/Marketplace
 import Business from "../../components/HomeComponents/Business/Business";
 import Testimony from "../../components/HomeComponents/Testimony/Testimony";
 import Projects from "../../components/HomeComponents/Projects/Projects";
-import { useQuery } from "@tanstack/react-query";
-import { Axios } from "../../config";
-import requests from "../../libs/request";
 import loader from "../../assets/icons/loader.svg";
 
 const Homepage = () => {
-  const { isLoading, error, data } = useQuery({
-    queryKey: ["gigs"],
-    queryFn: () => Axios.get(requests.gigs).then((res) => res.data),
-  });
 
   return (
     <main>

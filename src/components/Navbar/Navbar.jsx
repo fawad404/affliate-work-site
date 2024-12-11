@@ -112,7 +112,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await Axios.post(requests.logout);
+      await Axios.post("https://testing-backend-azure.vercel.app/api/auth/logout");
       removeAuthUser();
       toast.success("Logout Successfully", {
         position: "bottom-right",

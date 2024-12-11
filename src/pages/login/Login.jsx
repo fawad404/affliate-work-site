@@ -30,21 +30,29 @@ const Login = ({ show, setShow }) => {
     username: "",
     password: "",
   };
+
   const onSubmit = async (payload, actions) => {
     setLoading(true);
     try {
       const res = await Axios.post(requests.login, payload);
+  
+      // Log the result of the API call to the console
+      console.log("API Response:", res.data);
+  
       setAuthUser(res.data);
       localStorage.setItem("currentUser", JSON.stringify(res.data));
+  
       toast.success("Login Successfully", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
+  
       setShow(false);
       setLoading(false);
     } catch (error) {
       setLoading(false);
+  
       if (error?.response?.data) {
         toast.error(error?.response?.data, {
           position: "bottom-right",
@@ -58,10 +66,16 @@ const Login = ({ show, setShow }) => {
           autoClose: 1500,
         });
       }
+  
+      // Log the error for debugging purposes
+      console.error("Error during API call:", error);
     }
+  
+    // Simulate a delay and reset the form after submission
     await new Promise((resolve) => setTimeout(resolve, 1000));
     actions.resetForm();
   };
+  
 
   const { handleChange, values, handleBlur, handleSubmit, errors, touched } =
     useFormik({
