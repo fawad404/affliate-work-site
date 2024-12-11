@@ -40,6 +40,7 @@ const Contact = () => {
   };
 
 
+
   return (
     <section className="bg-gray-50 min-h-screen">
       {/* Hero Section */}
