@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -7,6 +7,24 @@ const Contact = () => {
     phone: "",
     message: ""
   });
+
+  // Fetch data automatically when the page is refreshed
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://testing-backend-azure.vercel.app/api/task");
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log("API Result:", result);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array ensures this runs only on initial render
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -18,8 +36,9 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    console.log("Form Data Submitted:", formData);
   };
+
 
   return (
     <section className="bg-gray-50 min-h-screen">
