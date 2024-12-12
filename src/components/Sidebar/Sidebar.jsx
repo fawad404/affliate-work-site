@@ -140,9 +140,28 @@ const Sidebar = () => {
           </div>
           <div>
             <ul className="mb-2">
-              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg" href="/dashboard/Profile">Dashboard</Link></li>
-              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg" href="/admin/users-list">UsersList</Link></li>
-              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg" href="/admin/search-queries">Search Queries</Link></li>
+              {authUser.isVerified && (
+                <li>
+                  <Link to="/dashboard/Profile" className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg">Profile</Link>
+                </li>
+              )}
+
+              {authUser.isAdmin && (
+                <>
+                  <li>
+                    <Link to="/dashboard/create-task" className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg">Create Task</Link>
+                  </li>
+                  <li>
+                    <Link to="/dashboard/users" className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg">Users list</Link>
+                  </li>
+                  <li>
+                    <Link to="/dashboard/tasks" className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg">Task</Link>
+                  </li>
+                </>
+              )}
+              <li>
+                <Link to="/dashboard/my-tasks" className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg">My Tasks</Link>
+              </li>
             </ul>
           </div>
         </nav>
