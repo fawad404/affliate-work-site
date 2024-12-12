@@ -24,13 +24,12 @@ export const registerSchema = yup.object({
   .required("Skills are required"), // Ensure skills field is not empty
   bankIban: yup.string()
   .matches(/^PK\d{2}[A-Z0-9]{4}\d{16}$/, 'IBAN must be in the format PKXXAAAA0000000000000000')  // IBAN format validation
-  .required('IBAN is required'),
+  ,
   easypaisaAccount: yup.string()
     .matches(
         /^(PK\d{2}[A-Z0-9]{4}\d{16})$|^((\+92|92|0)?3\d{9})$/,
         'Must be a valid Easypaisa IBAN or phone number in Pakistani format'
-    )
-    .required('Easypaisa IBAN or phone number is required'),
+    ),
 
   password: yup
     .string()
