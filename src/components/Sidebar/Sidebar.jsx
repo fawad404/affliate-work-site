@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from "react-router-dom";
 import useAuthStore from '../../stores';
-
+import logo from '../../assets/images/Exoertsync.jpg'
 const Sidebar = () => {
   const { authUser } = useAuthStore();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -12,7 +12,7 @@ const Sidebar = () => {
         <nav className="fixed top-0 left-0 bottom-0 flex flex-col w-[320px] lg:w-80 sm:max-w-xs pt-6 pb-8 bg-gray-800 overflow-y-auto">
           <div className="px-4 pb-6">
             <a className="inline-block text-lg font-bold mb-5" href="/">
-              <img className="h-10" src="https://static.shuffle.dev/components/preview/2b35aa24-5fd8-403a-84a4-f9f9a56536bd/assets/public/artemis-assets/logos/artemis-logo.svg" alt="Logo" width="auto" />
+              <img className="h-28 w-28 rounded-2xl" src={logo} alt="Logo" width="auto" />
             </a>
             <h3 className="mb-2 text-xs uppercase text-gray-500 font-medium">Main</h3>
             <ul className="mb-8 text-sm font-medium">
@@ -109,7 +109,7 @@ const Sidebar = () => {
       <div className="lg:hidden container py-3 px-4 mx-auto bg-gray-800">
         <div className="flex items-center">
           <a className="inline-block text-lg font-bold" href="/">
-            <img className="h-10" src="https://static.shuffle.dev/components/preview/2b35aa24-5fd8-403a-84a4-f9f9a56536bd/assets/public/artemis-assets/logos/artemis-logo.svg" alt="" width="auto" />
+            <img className="h-20 w-20 rounded-2xl" src={logo} alt="" width="auto" />
           </a>
           <div className="lg:hidden ml-auto">
             <button
@@ -131,8 +131,7 @@ const Sidebar = () => {
         <nav className="relative flex flex-col py-6 px-10 w-full h-full bg-gray-800 border-r overflow-y-auto">
           <div className="flex items-center mb-16">
             <a className="mr-auto text-2xl font-medium leading-none" href="/">
-              <img className="h-10" src="https://static.shuffle.dev/components/preview/2b35aa24-5fd8-403a-84a4-f9f9a56536bd/assets/public/artemis-assets/logos/artemis-logo.svg" alt="" width="auto" />
-            </a>
+            <img className="h-20 w-20 rounded-2xl" src={logo} alt="" width="auto" />            </a>
             <button onClick={() => setMobileNavOpen(!mobileNavOpen)}>
               <svg className="h-6 w-6 text-white cursor-pointer hover:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -141,9 +140,9 @@ const Sidebar = () => {
           </div>
           <div>
             <ul className="mb-2">
-              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 rounded-lg" href="/admin/restaurants-list">Restaurant List</Link></li>
-              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 rounded-lg" href="/admin/users-list">UsersList</Link></li>
-              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 rounded-lg" href="/admin/search-queries">Search Queries</Link></li>
+              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg" href="/dashboard/Profile">Dashboard</Link></li>
+              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg" href="/admin/users-list">UsersList</Link></li>
+              <li><Link className="block py-4 px-5 text-white hover:bg-orange-50 hover:text-black transition-all duration-200 rounded-lg" href="/admin/search-queries">Search Queries</Link></li>
             </ul>
           </div>
         </nav>

@@ -2,8 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.png" sizes="32x32" />
+    <!-- Multiple favicon sizes -->
+    <link rel="icon" type="image/svg+xml" href="/logo.png" sizes="any" />
+    <link rel="icon" type="image/png" href="/logo.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/logo.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      link[rel="icon"] {
+        min-width: 16px !important;
+        min-height: 16px !important;
+        display: inline-block !important;
+        visibility: visible !important;
+      }
+    </style>
     <title>Fiver Clone</title>
   </head>
   <body>
