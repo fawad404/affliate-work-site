@@ -113,7 +113,7 @@ const TaskDetail = ({ task, submittedTask, refetchSubmittedTask }) => {
           payload
         );
       }
-  
+      
       toast.success(res?.data.message || "Task submitted successfully", {
         position: "bottom-right",
         toastId: 1,

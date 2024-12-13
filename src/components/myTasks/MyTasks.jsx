@@ -3,9 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router-dom";
 import Axios from "axios";
 import PaginationControls from "../PaginationControls/PaginationControls";
-import FloatingWhatsApp from '../../components/FloatingWhatsApp/FloatingWhatsApp';
-import Sidebar from '../Sidebar/Sidebar';
-import Task from '../Task/Task';
+import FloatingWhatsApp from "../../components/FloatingWhatsApp/FloatingWhatsApp";
+import Sidebar from "../Sidebar/Sidebar";
+import Task from "../Task/Task";
 import loader from "../../assets/icons/loader.svg"; 
 import useAuthStore from "../../stores";
 
@@ -13,8 +13,8 @@ const MyTasks = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
-  const initialPage = parseInt(query.get('page') || '1');
-  const initialLimit = parseInt(query.get('per_page') || '5');
+  const initialPage = parseInt(query.get("page") || "1");
+  const initialLimit = parseInt(query.get("per_page") || "5");
 
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [limit, setLimit] = useState(initialLimit);
@@ -22,8 +22,8 @@ const MyTasks = () => {
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const page = parseInt(query.get('page') || '1');
-    const perPage = parseInt(query.get('per_page') || '5');
+    const page = parseInt(query.get("page") || "1");
+    const perPage = parseInt(query.get("per_page") || "5");
     setCurrentPage(page);
     setLimit(perPage);
   }, [location.search]);
@@ -62,38 +62,42 @@ const MyTasks = () => {
   };
 
   return (
-    <>
-      {isLoading ? (
-        <div className="flex items-center justify-center w-full mt-28">
-          <img src={loader} alt="Loading..." className="w-[40px]" />
-        </div>
-      ) : error ? (
-        <p className="text-xl md:text-2xl text-red-400 font-normal">
-          Error: Something went wrong
-        </p>
-      ) : (
-        <div className="flex max-lg:flex-col">
-          <Sidebar />
-          <div className="flex-1">
-            <FloatingWhatsApp />
-            <div className='flex flex-col'>
-              <Task tasks={data?.tasks || []} />
-              <div className="mt-4">
-                <PaginationControls
-                  totalPages={totalPages}
-                  currentPage={currentPage}
-                  perPage={limit}
-                  onNext={handleNext}
-                  onPrevious={handlePrevious}
-                  onPageChange={handlePageChange}
-                  onLimitChange={handleLimitChange}
-                />
-              </div>
-            </div>
+    <div className="flex max-lg:flex-col">
+      <Sidebar /> {/* Sidebar is always rendered */}
+      <div className="flex-1">
+        <FloatingWhatsApp />
+        {isLoading ? (
+          <div className="flex items-center justify-center w-full mt-28">
+            <img src={loader} alt="Loading..." className="w-[40px]" />
           </div>
-        </div>
-      )}
-    </>
+        ) : error ? (
+          error.response?.status === 404 ? ( // Handle 404 error
+            <p className="text-xl md:text-2xl text-gray-500 font-normal text-center mt-10">
+              No task is assigned to you.
+            </p>
+          ) : (
+            <p className="text-xl md:text-2xl text-red-400 font-normal text-center mt-10">
+              Error: Something went wrong
+            </p>
+          )
+        ) : (
+          <>
+            <Task tasks={data?.tasks || []} />
+            <div className="mt-4">
+              <PaginationControls
+                totalPages={totalPages}
+                currentPage={currentPage}
+                perPage={limit}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+                onPageChange={handlePageChange}
+                onLimitChange={handleLimitChange}
+              />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
