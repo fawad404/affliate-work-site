@@ -67,7 +67,6 @@ const Register = () => {
       const imageSrc = webcamRef.current.getScreenshot({ format: 'image/jpeg' });
       const imageBlob = dataURLtoBlob(imageSrc);
       const imageFile = new File([imageBlob], "liveSelfie.jpg", { type: "image/jpeg" });
-      console.log("Captured image file:", imageFile); // Add this line to log the captured image file
       setFieldValue("liveSelfie", imageFile);
       setIsCameraOpen(false);
     }, [webcamRef, setFieldValue]);
@@ -96,13 +95,6 @@ const Register = () => {
     const urlImgBack = await upload(values.idCardBack);
     const BankImage = await upload(values.bankImg);
     const LiveSelfie = await upload(values.liveSelfie);
-    console.log({payload});
-    console.log("Id card front img:", url);
-    console.log("url img:", urlImg);
-    console.log("url Back img:", urlImgBack);
-    console.log("url Back bankImg:", BankImage);
-    console.log("url Back liveSelfie:", LiveSelfie);
-    
 
     try {
       const res = await Axios.post(requests.register, {
@@ -782,7 +774,7 @@ const Register = () => {
                 id="idCardBack"
                 className="hidden"
               />
-              <div className={`flex justify-center items-center flex-col gap-3 w-full border h-[136px] rounded-md text-sm text-gray-600 ${touched.idCardBack && errors.idCardBack ? "border-red-500" : "border-gray-300"}`}>
+              <div className={`flex justify-center items-center flex-col gap-3 w-full border h-[200px] rounded-md text-sm text-gray-600 ${touched.idCardBack && errors.idCardBack ? "border-red-500" : "border-gray-300"}`}>
                 {values?.idCardBack?.type?.startsWith("image/") ? (
                   <label htmlFor="idCardBack" className="cursor-pointer h-full w-full flex items-center justify-center">
                     <img src={URL.createObjectURL(values.idCardBack)} alt="ID Card Back" className="w-[120px] h-[120px] object-cover" />
@@ -791,7 +783,7 @@ const Register = () => {
                   <>
                     <p>Upload ID Card Back</p>
                     <BsUpload size={20} />
-                    <label htmlFor="idCardBack" className="w-fit border py-2 px-5 rounded-md cursor-pointer">Browse</label>
+                    <label htmlFor="idCardBack" className="w-fit  border py-2 px-5 rounded-md cursor-pointer">Browse</label>
                   </>
                 )}
               </div>

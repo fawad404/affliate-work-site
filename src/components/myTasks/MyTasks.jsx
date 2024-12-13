@@ -14,7 +14,7 @@ const MyTasks = () => {
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search);
   const initialPage = parseInt(query.get('page') || '1');
-  const initialLimit = parseInt(query.get('per_page') || '1');
+  const initialLimit = parseInt(query.get('per_page') || '5');
 
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [limit, setLimit] = useState(initialLimit);
@@ -23,7 +23,7 @@ const MyTasks = () => {
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const page = parseInt(query.get('page') || '1');
-    const perPage = parseInt(query.get('per_page') || '1');
+    const perPage = parseInt(query.get('per_page') || '5');
     setCurrentPage(page);
     setLimit(perPage);
   }, [location.search]);
