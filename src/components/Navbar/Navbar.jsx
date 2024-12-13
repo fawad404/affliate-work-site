@@ -11,7 +11,7 @@ import requests from "../../libs/request";
 import { FiChevronRight } from "react-icons/fi";
 import { FaBars } from "react-icons/fa";
 import MobileSidebar from "./MobileSidebar/MobileSidebar";
-
+import logo from '../../assets/images/Exoertsync_prev_ui.png'
 const Navbar = () => {
   const navigate = useNavigate();
   const { authUser, removeAuthUser } = useAuthStore();
@@ -160,8 +160,7 @@ const Navbar = () => {
               to="/"
               className="text-4xl select-none font-black tracking-tighter"
             >
-              <span>fiverr</span>
-              <span className="text-primary">.</span>
+               <img src={logo} alt="Logo" className="w-24 h-auto object-contain max-lg:hidden" />
             </Link>
           </div>
 

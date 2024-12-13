@@ -4,6 +4,7 @@ import { TfiWorld } from "react-icons/tfi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
+
 const MobileSidebar = ({ show, setShow, setLoginModal }) => {
   const variants = {
     open: { opacity: 1, x: 0, transition: { duration: 0.3 } },
@@ -59,7 +60,7 @@ const MobileSidebar = ({ show, setShow, setLoginModal }) => {
             to="/join"
             className={`border py-3 px-6 rounded bg-primary border-primary text-white transition-all duration-300 text-base font-semibold`}
           >
-            Join Fiverr
+            Join  
           </NavLink>
           <div
             onClick={() => {

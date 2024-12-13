@@ -3,10 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <!-- Multiple favicon sizes -->
-    <link rel="icon" type="image/svg+xml" href="/logo.png" sizes="any" />
-    <link rel="icon" type="image/png" href="/logo.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="/logo.png" sizes="16x16" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="icon" type="image/svg+xml" href="/cropped_logo.png" sizes="any" />
+    <link rel="mask-icon" href="/cropped_logo.png" color="#000000" />
+    <link rel="icon" type="image/jpg" href="/cropped_logo.png" sizes="32x32" />
+    <link rel="icon" type="image/jpg" href="/cropped_logo.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/cropped_logo.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
@@ -15,9 +16,14 @@
         min-height: 16px !important;
         display: inline-block !important;
         visibility: visible !important;
+        -webkit-mask-image: url('/cropped_logo.png');
+        mask-image: url('/cropped_logo.png');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        border-radius: 50%;
       }
     </style>
-    <title>Fiver Clone</title>
+    <title>ExpertSync</title>
   </head>
   <body>
     <div id="root"></div>
