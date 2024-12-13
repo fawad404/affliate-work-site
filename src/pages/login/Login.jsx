@@ -36,23 +36,32 @@ const Login = ({ show, setShow }) => {
     try {
       const res = await Axios.post(requests.login, payload);
   
-      // Log the result of the API call to the console
-      console.log("API Response:", res.data);
+      // Extract the user's ID and token (if applicable) from the login response
+      const result = res.data;
   
-      setAuthUser(res.data);
-      localStorage.setItem("currentUser", JSON.stringify(res.data));
+      // Fetch the latest user data using the user ID
+      const userResponse = await Axios.get(`https://testing-backend-azure.vercel.app/api/user/${result._id}`);
   
+      const latestUser = userResponse.data;
+  
+      // Set the latest user data in Zustand store and localStorage
+      setAuthUser(latestUser);
+      localStorage.setItem("currentUser", JSON.stringify(latestUser));
+  
+      // Display a success toast
       toast.success("Login Successfully", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
   
+      // Close modal and reset loading state
       setShow(false);
       setLoading(false);
     } catch (error) {
       setLoading(false);
   
+      // Handle errors and show relevant messages
       if (error?.response?.data) {
         toast.error(error?.response?.data, {
           position: "bottom-right",
@@ -60,7 +69,7 @@ const Login = ({ show, setShow }) => {
           autoClose: 1500,
         });
       } else {
-        toast.error(error?.response?.message, {
+        toast.error("An unexpected error occurred.", {
           position: "bottom-right",
           toastId: 1,
           autoClose: 1500,
@@ -68,13 +77,14 @@ const Login = ({ show, setShow }) => {
       }
   
       // Log the error for debugging purposes
-      console.error("Error during API call:", error);
+      console.error("Error during login:", error);
     }
   
     // Simulate a delay and reset the form after submission
     await new Promise((resolve) => setTimeout(resolve, 1000));
     actions.resetForm();
   };
+  
   
 
   const { handleChange, values, handleBlur, handleSubmit, errors, touched } =

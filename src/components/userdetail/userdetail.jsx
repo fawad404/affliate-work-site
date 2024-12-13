@@ -1,48 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { BsCheckCircle, BsXCircle } from "react-icons/bs";
-import CustomizeTextarea from "../../utils/Input/CustomizeTextarea";
 import { useNavigate } from "react-router-dom";
 import loader from "../../assets/icons/loader.svg";
 import { Axios } from "../../config";
 import { toast } from "react-toastify";
-import useAuthStore from '../../stores'; // Import authStore
+import useAuthStore from "../../stores"; // Import authStore
 
-const dataDetail = ({ data, user }) => {
+const dataDetail = ({ data }) => {
   const navigate = useNavigate();
-  const { setAuthUser } = useAuthStore(); // Destructure setAuthUser from authStore
-  const [isVerified, setIsVerified] = useState(data.isVerified);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const { updateAuthUser } = useAuthStore(); // Get updateAuthUser from authStore
+  const [isVerified, setIsVerified] = useState(data.isVerified); // Track verified status locally
+  const [loading, setLoading] = useState(false); // Loading state for button
 
   const handleToggle = () => {
-    setIsVerified(!isVerified);
+    setIsVerified((prev) => !prev); // Toggle verified status locally
   };
 
   const handleUpdate = async () => {
-    setLoading(true);
-    const updatedUser = { ...data, isVerified };
+    setLoading(true); // Show loading spinner
+    const updatedUser = { ...data, isVerified }; // Prepare updated user data
+
     try {
       const res = await Axios.put(
         `https://testing-backend-azure.vercel.app/api/user/${data._id}`,
         updatedUser
       );
-      toast.success(res?.data || "User Status Updated Successfully", {
+
+      // Show success message
+      toast.success(res?.data || "User status updated successfully", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
-     // setAuthUser({ ...data, isVerified }); // Update authStore
+
+      // Update Zustand store with the new isVerified status
+      updateAuthUser(data._id, isVerified);
+
+      // Redirect after a short delay
       setTimeout(() => {
         navigate("/dashboard/users");
       }, 1500);
     } catch (error) {
       console.error(error);
-      toast.error(error?.response?.data || error?.response?.message, {
+      // Show error message
+      toast.error(error?.response?.data || "An error occurred", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1500,
       });
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading spinner
     }
   };
 

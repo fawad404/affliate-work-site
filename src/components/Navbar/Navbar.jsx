@@ -11,10 +11,11 @@ import requests from "../../libs/request";
 import { FiChevronRight } from "react-icons/fi";
 import { FaBars } from "react-icons/fa";
 import MobileSidebar from "./MobileSidebar/MobileSidebar";
-import logo from '../../assets/images/Exoertsync_prev_ui.png'
+import logo from "../../assets/images/Exoertsync_prev_ui.png";
+
 const Navbar = () => {
   const navigate = useNavigate();
-  const { authUser, removeAuthUser } = useAuthStore();
+  const { authUser, removeAuthUser, setAuthUser } = useAuthStore(); // Access setAuthUser
   const [active, setActive] = useState(false);
   const [openDrop, setOpenDrop] = useState(false);
   const [showLink, setShowLink] = useState(false);
@@ -38,10 +39,32 @@ const Navbar = () => {
     "Data Entry Task",
     "Content Review",
     "Product Descriptions",
-    "User Guide Creation",
-    "Blog Content Writing",
-    "SEO Optimization Tasks",
   ];
+
+  // Fetch the latest user data after refresh
+  useEffect(() => {
+    const fetchLatestUser = async () => {
+      const storedUser = JSON.parse(localStorage.getItem("currentUser"));
+      if (storedUser) {
+        try {
+          const response = await Axios.get(`https://testing-backend-azure.vercel.app/api/user/${storedUser._id}`);
+          setAuthUser(response.data); // Update Zustand store with the latest user data
+          localStorage.setItem("currentUser", JSON.stringify(response.data)); // Sync with localStorage
+          console.log("updated result user is:", response.data);
+        } catch (error) {
+          console.error("Failed to fetch latest user data:", error);
+          removeAuthUser(); // Clear user if fetching fails
+          localStorage.removeItem("currentUser");
+          toast.error("Failed to refresh user data. Please log in again.", {
+            position: "bottom-right",
+            autoClose: 1500,
+          });
+        }
+      }
+    };
+
+    fetchLatestUser();
+  }, [setAuthUser, removeAuthUser]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -61,59 +84,28 @@ const Navbar = () => {
     const cycleProjects = setInterval(() => {
       setProjectIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % projects.length;
-        
+
         // Update notification count, resetting to 1 after reaching 9
         setNotificationCount((prevCount) => (prevCount < 9 ? prevCount + 1 : 1));
-        
+
         // Add the next project to the dropdown list
         setDisplayedProjects((prevDisplayed) => {
           const updatedProjects = [...prevDisplayed, projects[nextIndex]];
           return updatedProjects.slice(-9); // Keep only the last 9 projects
         });
-        
+
         return nextIndex;
       });
-    }, 4000); // 2-second interval
+    }, 4000); // 4-second interval
 
     return () => clearInterval(cycleProjects);
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setOpenDrop(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    const backgroundChange = () => {
-      window.scrollY > 0 ? setActive(true) : setActive(false);
-    };
-    window.addEventListener("scroll", backgroundChange);
-    return () => {
-      window.removeEventListener("scroll", backgroundChange);
-    };
-  }, []);
-
-  const addNotification = (project) => {
-    setNotificationCount((prevCount) => prevCount + 1);
-    setDisplayedProjects((prevProjects) => [...prevProjects, project]);
-
-    // Trigger vibration
-    setIsVibrating(true);
-    setTimeout(() => setIsVibrating(false), 500); // Remove vibration after 0.5s
-  };
-
 
   const handleLogout = async () => {
     try {
       await Axios.post("https://testing-backend-azure.vercel.app/api/auth/logout");
       removeAuthUser();
+      localStorage.removeItem("currentUser");
       toast.success("Logout Successfully", {
         position: "bottom-right",
         toastId: 1,
@@ -121,7 +113,7 @@ const Navbar = () => {
       });
       navigate("/");
     } catch (error) {
-     toast.error(error?.response?.data || "Something went wrong", {
+      toast.error(error?.response?.data || "Something went wrong", {
         position: "bottom-right",
         toastId: 1,
         autoClose: 1000,
