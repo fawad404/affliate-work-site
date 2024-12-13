@@ -30,7 +30,7 @@ const dataDetail = ({ data, user }) => {
         toastId: 1,
         autoClose: 1500,
       });
-      setAuthUser({ ...data, isVerified }); // Update authStore
+     // setAuthUser({ ...data, isVerified }); // Update authStore
       setTimeout(() => {
         navigate("/dashboard/users");
       }, 1500);
