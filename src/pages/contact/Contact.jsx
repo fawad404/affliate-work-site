@@ -9,6 +9,8 @@ const Contact = () => {
   });
 
   // Fetch data automatically when the page is refreshed
+  const [response, setResponse] = useState("");
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,10 +36,37 @@ const Contact = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form Data Submitted:", formData);
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
+    setLoading(true);
+  
+    try {
+      const response = await fetch("https://testing-backend-azure.vercel.app/api/conversation/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Specify JSON format
+        },
+        body: JSON.stringify(formData), // Convert formData to JSON
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to submit: ${response.status} ${response.statusText}`);
+      }
+  
+      const result = await response.json(); // Parse response if needed
+      if(result){
+        setResponse("We recieved your details successfully will reach you soon!")
+        //console.log("Form submitted successfully:", result);
+
+      }
+  
+      // Optionally reset the form after successful submission
+      setFormData({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
+  
 
 
 
@@ -162,11 +191,22 @@ const Contact = () => {
                 ></textarea>
               </div>
               <button
-                type="submit"
-                className="bg-gradient-to-r from-blue-600 to-indigo-500 text-white py-3 px-8 rounded-lg shadow-md hover:opacity-90 transition duration-300"
-              >
-                Submit
-              </button>
+  type="submit"
+  className={`bg-gradient-to-r from-blue-600 to-indigo-500 text-white py-3 px-8 rounded-lg shadow-md transition duration-300 ${
+    loading ? 'opacity-70 cursor-not-allowed' : 'hover:opacity-90'
+  }`}
+  disabled={loading} // Disable button during loading state
+>
+  {!response ? (
+    <>
+      {loading ? 'Submitting...' : 'Submit'}
+    </>
+  ) : (
+    <>Sent</>
+  )}
+</button>
+
+              <p className="text-green-700 mt-4">{response ? response : ""}</p>
             </form>
           </div>
 
