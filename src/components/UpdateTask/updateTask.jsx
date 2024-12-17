@@ -159,7 +159,7 @@ const UpdateTask = () => {
   if (!taskData) return <div>Loading...</div>; // Loading fallback
 
   return (
-    <div className="py-10 ml-[300px]">
+    <div className="py-10 lg:ml-[300px]">
       <div className="contain">
         <div className="w-full lg:w-[75%] flex items-center flex-col justify-center py-10 mx-auto">
           <form
@@ -303,7 +303,7 @@ const UpdateTask = () => {
               </div>
               <button
                 type="submit"
-                className="w-[10%] mx-auto bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-3 transition-all duration-300 mt-3"
+                className="w-[175px] mx-auto bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-4 px-4 transition-all duration-300 mt-3"
               >
                 {loading ? (
                   <img src={loader} className="w-6 mx-auto" alt="Loading" />

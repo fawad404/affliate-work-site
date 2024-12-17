@@ -3,7 +3,8 @@ import { BsCurrencyDollar } from "react-icons/bs";
 import { TfiWorld } from "react-icons/tfi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
+import useAuthStore from "../../../stores"; // Import useAuthStore
+import logo from '../../../assets/images/Exoertsync.jpg'
 
 const MobileSidebar = ({ show, setShow, setLoginModal }) => {
   const variants = {
@@ -12,6 +13,7 @@ const MobileSidebar = ({ show, setShow, setLoginModal }) => {
   };
   const showRef = useRef(null);
   const navigate = useNavigate();
+  const { authUser, removeAuthUser } = useAuthStore(); // Access authUser and removeAuthUser
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -56,48 +58,70 @@ const MobileSidebar = ({ show, setShow, setLoginModal }) => {
         }`}
       >
         <div className="sticky top-0 z-2 bg-white w-full flex flex-col gap-6 items-start justify-start">
-          <NavLink
-            to="/join"
-            className={`border py-3 px-6 rounded bg-primary border-primary text-white transition-all duration-300 text-base font-semibold`}
-          >
-            Join  
-          </NavLink>
-          <div
-            onClick={() => {
-              navigate("/");
-              setShow(false);
-              setLoginModal(true);
-            }}
-            className="cursor-pointer text-gray-400 text-base font-medium"
-          >
-            Sign in
-          </div>
-        </div>
-        <p className="cursor-pointer text-gray-400 text-base font-medium">
-          Browser Categories
-        </p>
-        <p className="cursor-pointer text-gray-400 text-base font-medium">
-          About
-        </p>
-        <NavLink to="/" className={`text-base font-semibold text-gray-400`}>
-          Fiverr Business
-        </NavLink>
-        <div className="mt-5 border-t w-full flex items-start justify-start flex-col gap-4 pt-3">
-          <p className="cursor-pointer text-gray-400 text-base font-medium">
+          <a className="inline-block text-lg font-bold mb-5" href="/">
+            <img className="h-28 w-28 rounded-2xl" src={logo} alt="Logo" width="auto" />
+          </a>
+          {!authUser && (
+            <>
+              <NavLink
+                to="/join"
+                className={`border py-3 px-6 rounded bg-primary border-primary text-white transition-all duration-300 text-base font-semibold`}
+              >
+                Join  
+              </NavLink>
+              <div
+                onClick={() => {
+                  navigate("/");
+                  setShow(false);
+                  setLoginModal(true);
+                }}
+                className="cursor-pointer text-gray-400 text-base font-medium"
+              >
+                Sign in
+              </div>
+            </>
+          )}
+          <NavLink to="/" className="cursor-pointer w-full text-base font-medium text-gray-400">
             Home
-          </p>
-          <p className="cursor-pointer text-gray-400 text-base font-medium flex items-center justify-start gap-2">
-            English
-            <span>
-              <TfiWorld />
-            </span>
-          </p>
-          <p className="cursor-pointer text-gray-400 text-base font-medium flex items-center justify-start gap-2">
-            <span>
-              <BsCurrencyDollar />
-            </span>
-            USD
-          </p>
+          </NavLink>
+          <NavLink to="/about" className="cursor-pointer w-full text-base font-medium text-gray-400">
+            About
+          </NavLink>
+          <NavLink to="/contact" className="cursor-pointer w-full text-base font-medium text-gray-400">
+            Contact
+          </NavLink>
+          {authUser && (
+            <>
+              {authUser?.isVerified ? (
+                <>
+                  <NavLink to="/dashboard/profile" className="cursor-pointer w-full text-base font-medium text-gray-400">
+                    Profile
+                  </NavLink>
+                  <NavLink to="/dashboard/my-tasks" className="cursor-pointer w-full text-base font-medium text-gray-400">
+                    Tasks
+                  </NavLink>
+                </>
+              ) : (
+                <NavLink to="/verification" className="cursor-pointer w-full text-base font-medium text-gray-400">
+                  Under Verification
+                </NavLink>
+              )}
+            </>
+          )}
+          <div className="mt-5 border-t w-full flex items-start justify-start flex-col gap-4 pt-3">
+            <p className="cursor-pointer text-gray-400 text-base font-medium flex items-center justify-start gap-2">
+              English
+              <span>
+                <TfiWorld />
+              </span>
+            </p>
+            <p className="cursor-pointer text-gray-400 text-base font-medium flex items-center justify-start gap-2">
+              <span>
+                <BsCurrencyDollar />
+              </span>
+              USD
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>

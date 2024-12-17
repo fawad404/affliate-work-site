@@ -50,9 +50,9 @@ const Navbar = () => {
           const response = await Axios.get(`https://testing-backend-azure.vercel.app/api/user/${storedUser._id}`);
           setAuthUser(response.data); // Update Zustand store with the latest user data
           localStorage.setItem("currentUser", JSON.stringify(response.data)); // Sync with localStorage
-          console.log("updated result user is:", response.data);
+          // console.log("updated result user is:", response.data);
         } catch (error) {
-          console.error("Failed to fetch latest user data:", error);
+          // console.error("Failed to fetch latest user data:", error);
           removeAuthUser(); // Clear user if fetching fails
           localStorage.removeItem("currentUser");
           toast.error("Failed to refresh user data. Please log in again.", {

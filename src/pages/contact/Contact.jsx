@@ -19,7 +19,7 @@ const Contact = () => {
           throw new Error(`Error: ${response.status}`);
         }
         const result = await response.json();
-        console.log("API Result:", result);
+        // console.log("API Result:", result);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -71,9 +71,9 @@ const Contact = () => {
 
 
   return (
-    <section className="bg-gray-50 min-h-screen">
+    <section className="bg-gray-50 min-h-screen mt-32">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 to-indigo-500 py-24 text-white h-[50%]">
+      <div className="relative bg-gradient-to-r from-blue-600 to-indigo-500 py-24 text-white h-full">
         <div className="container mx-auto px-6 flex flex-col-reverse lg:flex-row items-center">
           {/* Text Content */}
           <div className="lg:w-1/2">
@@ -97,7 +97,7 @@ const Contact = () => {
           <div className="lg:w-1/2 mb-10 lg:mb-0 opacity-25">
             <img
               src="../../Contact.webp"
-              alt="Contact Illustration"
+              alt=""
               className="w-full"
             />
           </div>

@@ -2,13 +2,13 @@ import React from "react";
 
 export default function About() {
   return (
-    <section className="bg-gray-100">
+    <section className="bg-gray-100 mt-32">
       {/* Hero Section */}
       <div className="relative bg-active text-white">
         <div className="container mx-auto px-6 py-16 lg:flex lg:items-center lg:justify-between">
           <div className="lg:w-1/2">
-            <h1 className="text-4xl font-extrabold mb-4">
-              Welcome to Our Website
+            <h1 className="text-4xl font-extrabold mb-4 font-serif">
+              Welcome to Our ExpertSync
             </h1>
             <p className="text-lg mb-6">
               Empowering individuals to earn, grow, and succeed by working on
