@@ -171,7 +171,7 @@ const dataDetail = ({ data }) => {
       </div>
       <button
         type="submit"
-        className="w-[10%] mx-auto bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-3 transition-all duration-300 mt-3"
+        className="w-[200px] mx-auto bg-primary/80 hover:bg-primary cursor-pointer outline-none text-white rounded py-3 transition-all duration-300 mt-3"
         onClick={handleUpdate}
       >
         {loading ? (
